@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.xiaoyu.metadata;
+package org.xiaoyu.hunyuan.metadata;
 
 import org.springframework.ai.chat.metadata.Usage;
-import org.xiaoyu.api.HunYuanApi;
+import org.xiaoyu.hunyuan.api.HunYuanApi;
 import org.springframework.util.Assert;
 
 /**
@@ -50,11 +50,6 @@ public class HunYuanUsage implements Usage {
 	@Override
 	public Integer getCompletionTokens() {
 		return getUsage().completionTokens();
-	}
-
-	@Override
-	public Integer getTotalTokens() {
-		return getUsage().totalTokens();
 	}
 
 	@Override

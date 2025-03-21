@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.xiaoyu;
+package org.xiaoyu.hunyuan;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.xiaoyu.hunyuan.api.HunYuanApi;
 import org.springframework.ai.model.function.FunctionCallback;
 import org.springframework.ai.model.function.FunctionCallingOptions;
 import org.springframework.util.Assert;
-import org.xiaoyu.api.HunYuanApi;
 
 import java.util.*;
 

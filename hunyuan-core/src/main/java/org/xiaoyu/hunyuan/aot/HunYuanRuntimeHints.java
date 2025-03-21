@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.xiaoyu.aot;
+package org.xiaoyu.hunyuan.aot;
 
-import org.xiaoyu.api.HunYuanApi;
+import org.xiaoyu.hunyuan.api.HunYuanApi;
 import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;

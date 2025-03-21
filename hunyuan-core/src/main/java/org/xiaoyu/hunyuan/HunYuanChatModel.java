@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package org.xiaoyu;
+package org.xiaoyu.hunyuan;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.messages.*;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
 import org.springframework.ai.chat.metadata.ChatResponseMetadata;
 import org.springframework.ai.chat.metadata.EmptyUsage;
@@ -33,12 +36,12 @@ import org.springframework.ai.chat.observation.ChatModelObservationDocumentation
 import org.springframework.ai.chat.observation.DefaultChatModelObservationConvention;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.xiaoyu.api.HunYuanApi;
-import org.xiaoyu.api.HunYuanApi.*;
-import org.xiaoyu.api.HunYuanApi.ChatCompletion.*;
-import org.xiaoyu.api.HunYuanApi.ChatCompletionMessage.*;
-import org.xiaoyu.api.HunYuanConstants;
-import org.xiaoyu.metadata.HunYuanUsage;
+import org.xiaoyu.hunyuan.api.HunYuanApi;
+import org.xiaoyu.hunyuan.api.HunYuanApi.*;
+import org.xiaoyu.hunyuan.api.HunYuanApi.ChatCompletion.*;
+import org.xiaoyu.hunyuan.api.HunYuanApi.ChatCompletionMessage.*;
+import org.xiaoyu.hunyuan.api.HunYuanConstants;
+import org.xiaoyu.hunyuan.metadata.HunYuanUsage;
 import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.model.function.FunctionCallback;
 import org.springframework.ai.model.function.FunctionCallbackResolver;

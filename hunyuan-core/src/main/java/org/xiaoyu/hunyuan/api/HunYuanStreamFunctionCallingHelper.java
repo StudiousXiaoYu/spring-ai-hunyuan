@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.xiaoyu.api;
+package org.xiaoyu.hunyuan.api;
 
-import org.xiaoyu.api.HunYuanApi.*;
-import org.xiaoyu.api.HunYuanApi.ChatCompletionChunk.*;
-import org.xiaoyu.api.HunYuanApi.ChatCompletionMessage.*;
+import org.xiaoyu.hunyuan.api.HunYuanApi.*;
+import org.xiaoyu.hunyuan.api.HunYuanApi.ChatCompletionMessage.*;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 

@@ -10,6 +10,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>hunyuan-core</module>
+        <module>hunyuan-autoconfigure</module>
+        <module>hunyuan-starter</module>
     </modules>
 
     <properties>

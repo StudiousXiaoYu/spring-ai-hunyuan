@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package org.xiaoyu.api;
-
-import org.springframework.ai.observation.conventions.AiProvider;
+package org.xiaoyu.hunyuan.api;
 
 /**
  * Constants for HunYuan API.
@@ -29,7 +27,7 @@ public final class HunYuanConstants {
 
 	public static final String DEFAULT_CHAT_HOST = "hunyuan.tencentcloudapi.com";
 
-	public static final String PROVIDER_NAME = "hunyuan";
+	public static final String PROVIDER_NAME = "HUNYUAN";
 
 	public static final String DEFAULT_CHAT_ACTION = "ChatCompletions";
 

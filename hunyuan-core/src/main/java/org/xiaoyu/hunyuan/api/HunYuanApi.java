@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.xiaoyu.api;
+package org.xiaoyu.hunyuan.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xiaoyu.api.auth.HunYuanAuthApi;
+import org.xiaoyu.hunyuan.api.auth.ApiAuthHttpRequestInterceptor;
 import org.springframework.ai.model.ChatModelDescription;
 import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.retry.RetryUtils;
@@ -29,7 +29,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -63,7 +62,7 @@ public class HunYuanApi {
 
 	private final WebClient webClient;
 
-	private final HunYuanAuthApi hunyuanAuthApi;
+	private final ApiAuthHttpRequestInterceptor apiAuthHttpRequestInterceptor;
 
 	private final HunYuanStreamFunctionCallingHelper chunkMerger = new HunYuanStreamFunctionCallingHelper();
 
@@ -83,7 +82,11 @@ public class HunYuanApi {
 	 * @param secretKey Hunyuan SecretKey.
 	 */
 	public HunYuanApi(String baseUrl, String secretId, String secretKey) {
-		this(baseUrl, secretId, secretKey, RestClient.builder(), RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
+		this(baseUrl, secretId, secretKey,HunYuanConstants.DEFAULT_CHAT_ACTION, RestClient.builder(), RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
+	}
+
+	public HunYuanApi(String baseUrl, String secretId, String secretKey,String action) {
+		this(baseUrl, secretId, secretKey,action, RestClient.builder(), RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
 	}
 
 	/**
@@ -93,16 +96,39 @@ public class HunYuanApi {
 	 * @param restClientBuilder RestClient builder.
 	 * @param responseErrorHandler Response error handler.
 	 */
-	public HunYuanApi(String baseUrl, String secretId, String secretKey, RestClient.Builder restClientBuilder,
+	public HunYuanApi(String baseUrl, String secretId, String secretKey,RestClient.Builder restClientBuilder,
+					  ResponseErrorHandler responseErrorHandler) {
+
+		Consumer<HttpHeaders> jsonContentHeaders = headers -> {
+			headers.setContentType(MediaType.APPLICATION_JSON);
+		};
+		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey,HunYuanConstants.DEFAULT_CHAT_ACTION);
+		this.restClient = restClientBuilder.baseUrl(baseUrl)
+				.defaultHeaders(jsonContentHeaders)
+				.defaultStatusHandler(responseErrorHandler)
+				.requestInterceptor(apiAuthHttpRequestInterceptor)
+				.build();
+
+		this.webClient = WebClient.builder().baseUrl(baseUrl).defaultHeaders(jsonContentHeaders).build();
+	}
+	/**
+	 * Create a new client api.
+	 * @param baseUrl api base URL.
+	 * @param secretKey Hunyuan api Key.
+	 * @param restClientBuilder RestClient builder.
+	 * @param responseErrorHandler Response error handler.
+	 */
+	public HunYuanApi(String baseUrl, String secretId, String secretKey,String action, RestClient.Builder restClientBuilder,
 			ResponseErrorHandler responseErrorHandler) {
 
 		Consumer<HttpHeaders> jsonContentHeaders = headers -> {
 			headers.setContentType(MediaType.APPLICATION_JSON);
 		};
-		hunyuanAuthApi = new HunYuanAuthApi(secretId, secretKey);
+		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey,action);
 		this.restClient = restClientBuilder.baseUrl(baseUrl)
 			.defaultHeaders(jsonContentHeaders)
 			.defaultStatusHandler(responseErrorHandler)
+			.requestInterceptor(apiAuthHttpRequestInterceptor)
 			.build();
 
 		this.webClient = WebClient.builder().baseUrl(baseUrl).defaultHeaders(jsonContentHeaders).build();
@@ -117,20 +143,8 @@ public class HunYuanApi {
 	public ResponseEntity<ChatCompletionResponse> chatCompletionEntity(ChatCompletionRequest chatRequest) {
 
 		Assert.notNull(chatRequest, "The request body can not be null.");
-		String service = HunYuanConstants.DEFAULT_SERVICE;
-		String host = HunYuanConstants.DEFAULT_CHAT_HOST;
-		// String region = "ap-guangzhou";
-		String action = HunYuanConstants.DEFAULT_CHAT_ACTION;
-		MultiValueMap<String, String> jsonContentHeaders = hunyuanAuthApi.getHttpHeadersConsumer(host, action, service,
-				chatRequest);
-		ResponseEntity<String> retrieve = this.restClient.post().uri("/").headers(headers -> {
-			headers.addAll(jsonContentHeaders);
-		}).body(chatRequest).retrieve().toEntity(String.class);
-		// Compatible Return Position text/plain
-		logger.info("Response body: {}", retrieve.getBody());
-		ChatCompletionResponse chatCompletionResponse = ModelOptionsUtils.jsonToObject(retrieve.getBody(),
-				ChatCompletionResponse.class);
-		return ResponseEntity.ok(chatCompletionResponse);
+		ResponseEntity<ChatCompletionResponse> chatCompletionResponse = this.restClient.post().uri("/").body(chatRequest).retrieve().toEntity(ChatCompletionResponse.class);
+		return chatCompletionResponse;
 	}
 
 	/**
@@ -147,11 +161,9 @@ public class HunYuanApi {
 		String host = HunYuanConstants.DEFAULT_CHAT_HOST;
 		// String region = "ap-guangzhou";
 		String action = HunYuanConstants.DEFAULT_CHAT_ACTION;
-		MultiValueMap<String, String> jsonContentHeaders = hunyuanAuthApi.getHttpHeadersConsumer(host, action, service,
-				chatRequest);
-		return this.webClient.post().uri("/").headers(headers -> {
-			headers.addAll(jsonContentHeaders);
-		})
+		MultiValueMap<String, String> jsonContentHeaders = hunYuanAuthApi.getHttpHeadersConsumer(HunYuanConstants.DEFAULT_CHAT_ACTION,chatRequest);
+
+		return this.webClient.post().uri("/")
 			.body(Mono.just(chatRequest), ChatCompletionRequest.class)
 			.retrieve()
 			.bodyToFlux(String.class)
@@ -655,13 +667,13 @@ public class HunYuanApi {
 	public record ChatCompletion(
 	// @formatter:off
 	@JsonProperty("Id") String id,
-	@JsonProperty("Error") ChatCompletion.ErrorMsg errorMsg,
+	@JsonProperty("Error") ErrorMsg errorMsg,
 	@JsonProperty("Created") Long created,
 	@JsonProperty("Note") String note,
 	@JsonProperty("Choices") List<Choice> choices,
 	@JsonProperty("Usage") Usage usage,
 	@JsonProperty("ModerationLevel") String moderationLevel,
-	@JsonProperty("SearchInfo") ChatCompletion.SearchInfo searchInfo,
+	@JsonProperty("SearchInfo") SearchInfo searchInfo,
 	@JsonProperty("Replaces") List<Replace>  replaces,
 	@JsonProperty("RecommendedQuestions") List<String> recommendedQuestions,
 	@JsonProperty("RequestId") String requestId
