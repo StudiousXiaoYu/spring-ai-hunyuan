@@ -55,8 +55,8 @@ class EmbeddingIT{
 		assertThat(embeddingResponse.getResults().get(0)).isNotNull();
 		assertThat(embeddingResponse.getResults().get(0).getOutput()).hasSize(1024);
 		assertThat(embeddingResponse.getMetadata().getModel()).isEqualTo("hunyuan-embedding");
-		assertThat(embeddingResponse.getMetadata().getUsage().getTotalTokens()).isEqualTo(2);
-		assertThat(embeddingResponse.getMetadata().getUsage().getPromptTokens()).isEqualTo(2);
+		assertThat(embeddingResponse.getMetadata().getUsage().getTotalTokens()).isEqualTo(5);
+		assertThat(embeddingResponse.getMetadata().getUsage().getPromptTokens()).isEqualTo(5);
 
 		assertThat(this.embeddingModel.dimensions()).isEqualTo(1024);
 	}

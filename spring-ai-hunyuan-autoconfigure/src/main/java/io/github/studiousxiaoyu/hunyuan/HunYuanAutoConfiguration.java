@@ -16,10 +16,13 @@
 
 package io.github.studiousxiaoyu.hunyuan;
 
+import io.github.studiousxiaoyu.hunyuan.api.HunYuanEmbeddingModel;
 import io.micrometer.observation.ObservationRegistry;
+import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
 import org.springframework.ai.autoconfigure.retry.SpringAiRetryAutoConfiguration;
 import org.springframework.ai.chat.observation.ChatModelObservationConvention;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
+import org.springframework.ai.embedding.observation.EmbeddingModelObservationConvention;
 import org.springframework.ai.model.function.DefaultFunctionCallbackResolver;
 import org.springframework.ai.model.function.FunctionCallback;
 import org.springframework.ai.model.function.FunctionCallbackResolver;
@@ -37,6 +40,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
@@ -46,7 +50,7 @@ import java.util.List;
  * @author Guo Junyu
  */
 @AutoConfiguration(after = { RestClientAutoConfiguration.class, SpringAiRetryAutoConfiguration.class })
-@EnableConfigurationProperties({ HunYuanCommonProperties.class, HunYuanChatProperties.class })
+@EnableConfigurationProperties({ HunYuanCommonProperties.class, HunYuanChatProperties.class, HunYuanEmbeddingProperties.class })
 @ConditionalOnClass(HunYuanApi.class)
 public class HunYuanAutoConfiguration {
 
@@ -79,6 +83,29 @@ public class HunYuanAutoConfiguration {
 		DefaultFunctionCallbackResolver manager = new DefaultFunctionCallbackResolver();
 		manager.setApplicationContext(context);
 		return manager;
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	@ConditionalOnProperty(prefix = HunYuanEmbeddingProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
+			matchIfMissing = true)
+	public HunYuanEmbeddingModel hunYuanEmbeddingModel(HunYuanCommonProperties commonProperties,
+													  HunYuanEmbeddingProperties embeddingProperties, ObjectProvider<RestClient.Builder> restClientBuilderProvider,
+													  ObjectProvider<WebClient.Builder> webClientBuilderProvider, RetryTemplate retryTemplate,
+													  ResponseErrorHandler responseErrorHandler, ObjectProvider<ObservationRegistry> observationRegistry,
+													  ObjectProvider<EmbeddingModelObservationConvention> observationConvention) {
+
+		var hunyuanApi = hunyuanApi(embeddingProperties.getSecretId(), commonProperties.getSecretId(),
+				embeddingProperties.getSecretKey(), commonProperties.getSecretKey(), embeddingProperties.getBaseUrl(),
+				commonProperties.getBaseUrl(),
+				restClientBuilderProvider.getIfAvailable(RestClient::builder),responseErrorHandler);
+
+		var embeddingModel = new HunYuanEmbeddingModel(embeddingProperties.getOptions(), retryTemplate,hunyuanApi, embeddingProperties.getMetadataMode(),
+				observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP));
+
+		observationConvention.ifAvailable(embeddingModel::setObservationConvention);
+
+		return embeddingModel;
 	}
 
 	private HunYuanApi hunyuanApi(String secretId, String commonSecretId, String secretKey, String commonSecretKey,

@@ -17,6 +17,7 @@
 package io.github.studiousxiaoyu.hunyuan.embedding;
 
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
+import io.github.studiousxiaoyu.hunyuan.api.HunYuanConstants;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanEmbeddingModel;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanEmbeddingOptions;
 import io.micrometer.observation.tck.TestObservationRegistry;
@@ -62,7 +63,6 @@ public class HunYuanEmbeddingModelObservationIT {
 	void observationForEmbeddingOperation() {
 		var options = HunYuanEmbeddingOptions.builder()
 			.model(HunYuanApi.EmbeddingModel.HUNYUAN_EMBEDDING.getValue())
-			.dimensions(1024)
 			.build();
 
 		EmbeddingRequest embeddingRequest = new EmbeddingRequest(List.of("Here comes the sun"), options);
@@ -80,11 +80,10 @@ public class HunYuanEmbeddingModelObservationIT {
 			.hasContextualNameEqualTo("embedding " + HunYuanApi.EmbeddingModel.HUNYUAN_EMBEDDING.getValue())
 			.hasLowCardinalityKeyValue(LowCardinalityKeyNames.AI_OPERATION_TYPE.asString(),
 					AiOperationType.EMBEDDING.value())
-			.hasLowCardinalityKeyValue(LowCardinalityKeyNames.AI_PROVIDER.asString(), AiProvider.OPENAI.value())
+			.hasLowCardinalityKeyValue(LowCardinalityKeyNames.AI_PROVIDER.asString(), HunYuanConstants.PROVIDER_NAME)
 			.hasLowCardinalityKeyValue(LowCardinalityKeyNames.REQUEST_MODEL.asString(),
 					HunYuanApi.EmbeddingModel.HUNYUAN_EMBEDDING.getValue())
 			.hasLowCardinalityKeyValue(LowCardinalityKeyNames.RESPONSE_MODEL.asString(), responseMetadata.getModel())
-			.hasHighCardinalityKeyValue(HighCardinalityKeyNames.REQUEST_EMBEDDING_DIMENSIONS.asString(), "1536")
 			.hasHighCardinalityKeyValue(HighCardinalityKeyNames.USAGE_INPUT_TOKENS.asString(),
 					String.valueOf(responseMetadata.getUsage().getPromptTokens()))
 			.hasHighCardinalityKeyValue(HighCardinalityKeyNames.USAGE_TOTAL_TOKENS.asString(),

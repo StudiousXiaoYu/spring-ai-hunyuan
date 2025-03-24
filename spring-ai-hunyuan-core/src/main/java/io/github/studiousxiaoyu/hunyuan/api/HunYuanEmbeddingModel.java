@@ -93,7 +93,7 @@ public class HunYuanEmbeddingModel extends AbstractEmbeddingModel {
                 .observation(this.observationConvention, DEFAULT_OBSERVATION_CONVENTION, () -> observationContext,
                         this.observationRegistry)
                 .observe(() -> {
-                    HunYuanApi.EmbeddingList<HunYuanApi.Embedding> apiEmbeddingResponse = this.retryTemplate
+                    HunYuanApi.EmbeddingList apiEmbeddingResponse = this.retryTemplate
                             .execute(ctx -> this.hunYuanApi.embeddings(apiRequest));
 
                     if (apiEmbeddingResponse == null) {
@@ -130,7 +130,7 @@ public class HunYuanEmbeddingModel extends AbstractEmbeddingModel {
 
     private HunYuanApi.EmbeddingRequest<List<String>> createRequest(EmbeddingRequest request,
                                                                     HunYuanEmbeddingOptions requestOptions) {
-        return new HunYuanApi.EmbeddingRequest<>(request.getInstructions(),  requestOptions.getDimensions());
+        return new HunYuanApi.EmbeddingRequest<>(request.getInstructions());
     }
 
     /**
@@ -152,5 +152,10 @@ public class HunYuanEmbeddingModel extends AbstractEmbeddingModel {
                 .dimensions(ModelOptionsUtils.mergeOption(runtimeOptionsForProvider.getDimensions(),
                         defaultOptions.getDimensions()))
                 .build();
+    }
+
+    public void setObservationConvention(EmbeddingModelObservationConvention observationConvention) {
+        Assert.notNull(observationConvention, "observationConvention cannot be null");
+        this.observationConvention = observationConvention;
     }
 }

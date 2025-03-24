@@ -16,6 +16,7 @@
 
 package io.github.studiousxiaoyu.hunyuan;
 
+import io.github.studiousxiaoyu.hunyuan.api.HunYuanEmbeddingModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
@@ -24,11 +25,13 @@ import org.springframework.ai.autoconfigure.retry.SpringAiRetryAutoConfiguration
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -71,6 +74,23 @@ public class HunYuanAutoConfigurationIT {
 
 			assertThat(response).isNotEmpty();
 			logger.info("Response: " + response);
+		});
+	}
+
+	@Test
+	void embedding() {
+		this.contextRunner.run(context -> {
+			HunYuanEmbeddingModel embeddingModel = context.getBean(HunYuanEmbeddingModel.class);
+
+			EmbeddingResponse embeddingResponse = embeddingModel
+					.embedForResponse(List.of("Hello World", "World is big and salvation is near"));
+			assertThat(embeddingResponse.getResults()).hasSize(2);
+			assertThat(embeddingResponse.getResults().get(0).getOutput()).isNotEmpty();
+			assertThat(embeddingResponse.getResults().get(0).getIndex()).isEqualTo(0);
+			assertThat(embeddingResponse.getResults().get(1).getOutput()).isNotEmpty();
+			assertThat(embeddingResponse.getResults().get(1).getIndex()).isEqualTo(1);
+
+			assertThat(embeddingModel.dimensions()).isEqualTo(1024);
 		});
 	}
 

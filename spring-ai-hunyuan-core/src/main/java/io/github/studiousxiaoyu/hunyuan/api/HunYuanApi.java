@@ -216,7 +216,7 @@ public class HunYuanApi {
 			.flatMap(mono -> mono);
 	}
 
-	public <T> EmbeddingList<Embedding> embeddings(EmbeddingRequest<T> embeddingRequest)  {
+	public <T> EmbeddingList embeddings(EmbeddingRequest<T> embeddingRequest)  {
 		Assert.notNull(embeddingRequest, "The request body can not be null.");
 
 		// Input text to embed, encoded as a string or array of tokens. To embed multiple
@@ -946,26 +946,13 @@ public class HunYuanApi {
 	}
 	@JsonInclude(Include.NON_NULL)
 	public record EmbeddingRequest<T>(// @formatter:off
-									  @JsonProperty("InputList") T input,
-									  @JsonProperty("dimensions") Integer dimensions) { // @formatter:on
+									  @JsonProperty("InputList") T input) { // @formatter:on
 	}
 	@JsonInclude(Include.NON_NULL)
 	public record Embedding(// @formatter:off
 							@JsonProperty("Index") Integer index,
 							@JsonProperty("Embedding") float[] embedding,
 							@JsonProperty("Object") String object) { // @formatter:on
-
-		/**
-		 * Create an embedding with the given index, embedding and object type set to
-		 * 'embedding'.
-		 * @param index The index of the embedding in the list of embeddings.
-		 * @param embedding The embedding vector, which is a list of floats. The length of
-		 * vector depends on the model.
-		 */
-		public Embedding(Integer index, float[] embedding) {
-			this(index, embedding, "embedding");
-		}
-
 	}
 	@JsonInclude(Include.NON_NULL)
 	public record EmbeddingResponse(
@@ -975,9 +962,9 @@ public class HunYuanApi {
 		// @formatter:on
 	}
 	@JsonInclude(Include.NON_NULL)
-	public record EmbeddingList<T>(// @formatter:off
+	public record EmbeddingList(// @formatter:off
 								   @JsonProperty("RequestId") String object,
-								   @JsonProperty("Data") List<T> data,
+								   @JsonProperty("Data") List<Embedding> data,
 								   @JsonProperty("Usage") Usage usage) { // @formatter:on
 	}
 }

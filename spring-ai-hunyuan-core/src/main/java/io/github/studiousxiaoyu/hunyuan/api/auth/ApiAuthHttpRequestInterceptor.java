@@ -32,6 +32,7 @@ public class ApiAuthHttpRequestInterceptor implements ClientHttpRequestIntercept
             MultiValueMap<String, String> httpHeadersConsumer = hunYuanAuthApi.getHttpHeadersConsumer(action, body);
 			request.getHeaders().putAll(httpHeadersConsumer);
             ClientHttpResponse response = execution.execute(request, body);
+//            logResponse(response);
             return response;
         }
 
