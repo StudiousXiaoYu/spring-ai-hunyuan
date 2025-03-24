@@ -4,15 +4,39 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.xiaoyu</groupId>
+    <groupId>io.github.studiousxiaoyu</groupId>
     <artifactId>spring-ai-hunyuan</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
     <modules>
-        <module>hunyuan-core</module>
-        <module>hunyuan-autoconfigure</module>
-        <module>hunyuan-starter</module>
+        <module>spring-ai-hunyuan-core</module>
+        <module>spring-ai-hunyuan-autoconfigure</module>
+        <module>spring-ai-hunyuan-starter</module>
     </modules>
+    <name>Spring AI HunYuan</name>
+    <url>https://github.com/StudiousXiaoYu/spring-ai-hunyuan</url>
+    <description>Building AI applications with Spring Boot</description>
+    <scm>
+        <url>https://github.com/StudiousXiaoYu/spring-ai-hunyuan</url>
+        <connection>git@github.com:StudiousXiaoYu/spring-ai-hunyuan.git</connection>
+        <developerConnection>git@github.com:StudiousXiaoYu/spring-ai-hunyuan.git</developerConnection>
+    </scm>
+    <licenses>
+        <license>
+            <name>Apache 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <id>StudiousXiaoYu</id>
+            <name>JunYu Guo</name>
+            <email>junyu8848@gmail.com</email>
+            <organization>StudiousXiaoYu</organization>
+            <organizationUrl>https://github.com/StudiousXiaoYu</organizationUrl>
+        </developer>
+    </developers>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -53,4 +77,58 @@
             </snapshots>
         </repository>
     </repositories>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.7.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>my-public-project</publishingServerId>
+<!--                    <autoPublish>true</autoPublish>-->
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.studiousxiaoyu</groupId>
+        <artifactId>spring-ai-hunyuan</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>spring-ai-hunyuan-starter</artifactId>
+    <name>Spring AI HunYuan Starter</name>
+    <packaging>jar</packaging>
+    <url>https://github.com/StudiousXiaoYu/spring-ai-hunyuan</url>
+    <scm>
+        <url>https://github.com/StudiousXiaoYu/spring-ai-hunyuan</url>
+        <connection>git@github.com:StudiousXiaoYu/spring-ai-hunyuan.git</connection>
+        <developerConnection>git@github.com:StudiousXiaoYu/spring-ai-hunyuan.git</developerConnection>
+    </scm>
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.studiousxiaoyu</groupId>
+            <artifactId>spring-ai-hunyuan-autoconfigure</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.studiousxiaoyu</groupId>
+            <artifactId>spring-ai-hunyuan-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
+    </dependencies>
+
+</project>
