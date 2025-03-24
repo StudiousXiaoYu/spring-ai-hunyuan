@@ -6,7 +6,7 @@
 
     <groupId>io.github.studiousxiaoyu</groupId>
     <artifactId>spring-ai-hunyuan</artifactId>
-    <version>${revision}</version>
+    <version>1.0.0-M6</version>
     <packaging>pom</packaging>
     <modules>
         <module>spring-ai-hunyuan-core</module>
@@ -42,7 +42,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <revision>1.0.0-M6-SNAPSHOT</revision>
+        <revision>1.0.0-M6</revision>
         <spring-boot.version>3.3.3</spring-boot.version>
         <!-- Spring AI -->
         <spring-ai.version>1.0.0-M6</spring-ai.version>
@@ -67,16 +67,16 @@
     </dependencies>
 </dependencyManagement>
 
-    <repositories>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+<!--    <repositories>-->
+<!--        <repository>-->
+<!--            <id>spring-milestones</id>-->
+<!--            <name>Spring Milestones</name>-->
+<!--            <url>https://repo.spring.io/milestone</url>-->
+<!--            <snapshots>-->
+<!--                <enabled>false</enabled>-->
+<!--            </snapshots>-->
+<!--        </repository>-->
+<!--    </repositories>-->
     <build>
         <plugins>
             <plugin>

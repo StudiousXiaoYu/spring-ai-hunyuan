@@ -6,8 +6,7 @@
     <parent>
         <groupId>io.github.studiousxiaoyu</groupId>
         <artifactId>spring-ai-hunyuan</artifactId>
-        <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
+        <version>1.0.0-M6</version>
     </parent>
 
     <artifactId>spring-ai-hunyuan-core</artifactId>

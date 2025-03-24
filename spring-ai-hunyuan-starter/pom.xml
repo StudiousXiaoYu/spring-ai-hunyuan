@@ -6,8 +6,7 @@
     <parent>
         <groupId>io.github.studiousxiaoyu</groupId>
         <artifactId>spring-ai-hunyuan</artifactId>
-        <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
+        <version>1.0.0-M6</version>
     </parent>
 
     <artifactId>spring-ai-hunyuan-starter</artifactId>
@@ -34,13 +33,13 @@
         <dependency>
             <groupId>io.github.studiousxiaoyu</groupId>
             <artifactId>spring-ai-hunyuan-autoconfigure</artifactId>
-            <version>${revision}</version>
+            <version>1.0.0-M6</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.studiousxiaoyu</groupId>
             <artifactId>spring-ai-hunyuan-core</artifactId>
-            <version>${revision}</version>
+            <version>1.0.0-M6</version>
         </dependency>
     </dependencies>
 
