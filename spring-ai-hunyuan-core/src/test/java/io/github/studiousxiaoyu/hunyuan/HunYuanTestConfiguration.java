@@ -17,6 +17,7 @@
 package io.github.studiousxiaoyu.hunyuan;
 
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
+import io.github.studiousxiaoyu.hunyuan.api.HunYuanEmbeddingModel;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.StringUtils;
@@ -41,6 +42,11 @@ public class HunYuanTestConfiguration {
 	@Bean
 	public HunYuanChatModel hunYuanChatModel(HunYuanApi hunYuanApi) {
 		return new HunYuanChatModel(hunYuanApi);
+	}
+
+	@Bean
+	public HunYuanEmbeddingModel openAiEmbeddingModel(HunYuanApi api) {
+		return new HunYuanEmbeddingModel(api);
 	}
 
 }

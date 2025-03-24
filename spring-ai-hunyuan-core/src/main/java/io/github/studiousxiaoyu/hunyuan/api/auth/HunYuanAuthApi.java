@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.model.ModelOptionsUtils;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanConstants;
+import org.springframework.http.HttpRequest;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 
@@ -40,7 +41,6 @@ public class HunYuanAuthApi {
 
 	private final String secretKey;
 	private final String host;
-	private final String action;
 	private final String service;
 
 	/**
@@ -48,11 +48,10 @@ public class HunYuanAuthApi {
 	 * @param secretId The secret ID used for authentication.
 	 * @param secretKey The secret key used for authentication.
 	 */
-	public HunYuanAuthApi(String secretId, String secretKey, String host, String action, String service) {
+	public HunYuanAuthApi(String secretId, String secretKey, String host,String service) {
 		this.secretId = secretId;
 		this.secretKey = secretKey;
 		this.host = host;
-		this.action = action;
 		this.service = service;
 	}
 
@@ -99,7 +98,7 @@ public class HunYuanAuthApi {
 	 * @return A MultiValueMap containing the HTTP headers needed for the authenticated
 	 * request.
 	 */
-	public MultiValueMap<String, String> getHttpHeadersConsumer(String action,byte[] body) {
+	public MultiValueMap<String, String> getHttpHeadersConsumer(String action, byte[] body) {
 		// String timestamp = "1551113065";
 		String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

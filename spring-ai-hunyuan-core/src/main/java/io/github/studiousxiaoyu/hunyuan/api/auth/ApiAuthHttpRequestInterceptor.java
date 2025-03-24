@@ -21,20 +21,17 @@ public class ApiAuthHttpRequestInterceptor implements ClientHttpRequestIntercept
         private final Log log = LogFactory.getLog(ApiAuthHttpRequestInterceptor.class);
 
 		private final HunYuanAuthApi hunYuanAuthApi;
-		private final String action;
 
-		public ApiAuthHttpRequestInterceptor(String secretId, String secretKey,String action) {
-            this.hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey, HunYuanConstants.DEFAULT_CHAT_HOST, action, HunYuanConstants.DEFAULT_SERVICE);
-			this.action = action;
+		public ApiAuthHttpRequestInterceptor(String secretId, String secretKey) {
+            this.hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey, HunYuanConstants.DEFAULT_CHAT_HOST, HunYuanConstants.DEFAULT_SERVICE);
         }
 
         @Override
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-			MultiValueMap<String, String> httpHeadersConsumer = hunYuanAuthApi.getHttpHeadersConsumer(action, body);
+            String action = request.getHeaders().getFirst("X-TC-Action");
+            MultiValueMap<String, String> httpHeadersConsumer = hunYuanAuthApi.getHttpHeadersConsumer(action, body);
 			request.getHeaders().putAll(httpHeadersConsumer);
-			logRequest(request, body);
             ClientHttpResponse response = execution.execute(request, body);
-            logResponse(response);
             return response;
         }
 
