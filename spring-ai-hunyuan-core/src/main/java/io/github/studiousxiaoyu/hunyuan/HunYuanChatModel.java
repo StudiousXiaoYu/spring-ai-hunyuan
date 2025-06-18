@@ -64,7 +64,7 @@ import java.util.stream.Collectors;
  *
  * @author Guo Junyu
  */
-public class HunYuanChatModel implements ChatModel, StreamingChatModel {
+public class HunYuanChatModel implements ChatModel {
 
 	private static final Logger logger = LoggerFactory.getLogger(HunYuanChatModel.class);
 
