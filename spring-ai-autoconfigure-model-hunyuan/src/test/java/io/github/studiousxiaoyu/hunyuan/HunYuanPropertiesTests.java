@@ -129,8 +129,7 @@ public class HunYuanPropertiesTests {
 		new ApplicationContextRunner()
 			.withPropertyValues("spring.ai.hunyuan.secret-id=API_ID", "spring.ai.hunyuan.secret-key=API_KEY",
 					"spring.ai.hunyuan.base-url=TEST_BASE_URL", "spring.ai.hunyuan.chat.enabled=false")
-			.withConfiguration(AutoConfigurations.of(SpringAiRetryAutoConfiguration.class,
-					RestClientAutoConfiguration.class, HunYuanAutoConfiguration.class))
+			.withConfiguration(AutoConfigurations.of(HunYuanAutoConfiguration.class))
 			.run(context -> {
 				assertThat(context.getBeansOfType(HunYuanChatProperties.class)).isNotEmpty();
 				assertThat(context.getBeansOfType(HunYuanChatModel.class)).isEmpty();
@@ -139,8 +138,7 @@ public class HunYuanPropertiesTests {
 		new ApplicationContextRunner()
 			.withPropertyValues("spring.ai.hunyuan.secret-id=API_ID", "spring.ai.hunyuan.secret-key=API_KEY",
 					"spring.ai.hunyuan.base-url=TEST_BASE_URL")
-			.withConfiguration(AutoConfigurations.of(SpringAiRetryAutoConfiguration.class,
-					RestClientAutoConfiguration.class, HunYuanAutoConfiguration.class))
+			.withConfiguration(AutoConfigurations.of(HunYuanAutoConfiguration.class))
 			.run(context -> {
 				assertThat(context.getBeansOfType(HunYuanChatProperties.class)).isNotEmpty();
 				assertThat(context.getBeansOfType(HunYuanChatModel.class)).isNotEmpty();
@@ -149,8 +147,7 @@ public class HunYuanPropertiesTests {
 		new ApplicationContextRunner()
 			.withPropertyValues("spring.ai.hunyuan.secret-id=API_ID", "spring.ai.hunyuan.secret-key=API_KEY",
 					"spring.ai.hunyuan.base-url=TEST_BASE_URL", "spring.ai.hunyuan.chat.enabled=true")
-			.withConfiguration(AutoConfigurations.of(SpringAiRetryAutoConfiguration.class,
-					RestClientAutoConfiguration.class, HunYuanAutoConfiguration.class))
+			.withConfiguration(AutoConfigurations.of(HunYuanAutoConfiguration.class))
 			.run(context -> {
 				assertThat(context.getBeansOfType(HunYuanChatProperties.class)).isNotEmpty();
 				assertThat(context.getBeansOfType(HunYuanChatModel.class)).isNotEmpty();

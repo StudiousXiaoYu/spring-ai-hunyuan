@@ -236,7 +236,20 @@ public class HunYuanChatModel implements ChatModel, StreamingChatModel {
 					logger.warn("No chat completion returned for prompt: {}", prompt);
 					return new ChatResponse(List.of());
 				}
+				if (chatCompletion.errorMsg() != null) {
+					logger.warn("Error in chat completion: {}",
+							chatCompletion != null ? chatCompletion.errorMsg() : "Unknown error");
 
+					ErrorMsg errorMsg = chatCompletion != null ? chatCompletion.errorMsg()
+							: new ErrorMsg("UNKNOWN_ERROR", "An unknown error occurred.");
+
+					String errorMessage = String.format("API Error [%s]: %s", errorMsg.index(), errorMsg.message());
+
+					// 构建一个包含错误信息的 Generation
+					var errorGeneration = new Generation(new AssistantMessage(errorMessage));
+
+					return new ChatResponse(List.of(errorGeneration));
+				}
 				List<Choice> choices = chatCompletion.choices();
 				if (choices == null) {
 					logger.warn("No choices returned for prompt: {}", prompt);

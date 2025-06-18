@@ -165,8 +165,8 @@ public class HunYuanApi {
 			.body(chatRequest)
 			.retrieve()
 			.toEntity(String.class);
-		ChatCompletionResponse chatCompletionResponse  = ModelOptionsUtils.jsonToObject(
-					response.getBody(), ChatCompletionResponse.class);
+		ChatCompletionResponse chatCompletionResponse = ModelOptionsUtils.jsonToObject(response.getBody(),
+				ChatCompletionResponse.class);
 		return ResponseEntity.ok(chatCompletionResponse);
 	}
 
