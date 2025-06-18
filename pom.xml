@@ -6,12 +6,12 @@
 
     <groupId>io.github.studiousxiaoyu</groupId>
     <artifactId>spring-ai-hunyuan</artifactId>
-    <version>1.0.0-M6.1</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
     <modules>
         <module>spring-ai-hunyuan-core</module>
-        <module>spring-ai-hunyuan-autoconfigure</module>
-        <module>spring-ai-hunyuan-starter</module>
+        <module>spring-ai-autoconfigure-model-hunyuan</module>
+        <module>spring-ai-starter-model-hunyuan</module>
     </modules>
     <name>Spring AI HunYuan</name>
     <url>https://github.com/StudiousXiaoYu/spring-ai-hunyuan</url>
@@ -42,10 +42,10 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <revision>1.0.0-M6.1</revision>
+        <revision>1.0.0</revision>
         <spring-boot.version>3.3.3</spring-boot.version>
         <!-- Spring AI -->
-        <spring-ai.version>1.0.0-M6</spring-ai.version>
+        <spring-ai.version>1.0.0</spring-ai.version>
         <xml.bind.version>2.3.0</xml.bind.version>
     </properties>
 <dependencyManagement>
@@ -79,6 +79,20 @@
     </repositories>
     <build>
         <plugins>
+            <plugin>
+                <groupId>io.spring.javaformat</groupId>
+                <artifactId>spring-javaformat-maven-plugin</artifactId>
+                <version>0.0.39</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>validate</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <inherited>true</inherited>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.sonatype.central</groupId>
                 <artifactId>central-publishing-maven-plugin</artifactId>

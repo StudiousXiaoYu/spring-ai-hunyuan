@@ -102,14 +102,14 @@ public class HunYuanEmbeddingModelObservationIT {
 
 		@Bean
 		public HunYuanApi openAiApi() {
-			return new HunYuanApi(System.getenv("HUNYUAN_SECRET_ID"),System.getenv("HUNYUAN_SECRET_KEY"));
+			return new HunYuanApi(System.getenv("HUNYUAN_SECRET_ID"), System.getenv("HUNYUAN_SECRET_KEY"));
 		}
 
 		@Bean
 		public HunYuanEmbeddingModel hunYuanEmbeddingModel(HunYuanApi openAiApi,
 				TestObservationRegistry observationRegistry) {
-			return new HunYuanEmbeddingModel(HunYuanEmbeddingOptions.builder().build(),
-					RetryTemplate.defaultInstance(),openAiApi, MetadataMode.EMBED,  observationRegistry);
+			return new HunYuanEmbeddingModel(HunYuanEmbeddingOptions.builder().build(), RetryTemplate.defaultInstance(),
+					openAiApi, MetadataMode.EMBED, observationRegistry);
 		}
 
 	}

@@ -21,7 +21,6 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.github.studiousxiaoyu.hunyuan.HunYuanAutoConfiguration;
-import org.springframework.ai.autoconfigure.retry.SpringAiRetryAutoConfiguration;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -29,17 +28,18 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import io.github.studiousxiaoyu.hunyuan.HunYuanChatModel;
 import io.github.studiousxiaoyu.hunyuan.HunYuanChatOptions;
-import org.springframework.ai.model.function.FunctionCallingOptions;
+import org.springframework.ai.retry.autoconfigure.SpringAiRetryAutoConfiguration;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Description;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,15 +49,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @EnabledIfEnvironmentVariable(named = "HUNYUAN_SECRET_ID", matches = ".+")
 @EnabledIfEnvironmentVariable(named = "HUNYUAN_SECRET_KEY", matches = ".+")
-class FunctionCallbackWithPlainFunctionBeanIT {
+public class HunYuanFunctionCallbackIT {
 
-	private final Logger logger = LoggerFactory.getLogger(FunctionCallbackWithPlainFunctionBeanIT.class);
+	private final Logger logger = LoggerFactory.getLogger(HunYuanFunctionCallbackIT.class);
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 		.withPropertyValues("spring.ai.hunyuan.secret-id=" + System.getenv("HUNYUAN_SECRET_ID"))
 		.withPropertyValues("spring.ai.hunyuan.secret-key=" + System.getenv("HUNYUAN_SECRET_KEY"))
-		.withConfiguration(AutoConfigurations.of(SpringAiRetryAutoConfiguration.class,
-				RestClientAutoConfiguration.class, HunYuanAutoConfiguration.class))
+		.withConfiguration(AutoConfigurations.of(HunYuanAutoConfiguration.class))
 		.withUserConfiguration(Config.class);
 
 	@Test
@@ -66,45 +65,16 @@ class FunctionCallbackWithPlainFunctionBeanIT {
 
 			HunYuanChatModel chatModel = context.getBean(HunYuanChatModel.class);
 
-			// Test weatherFunction
 			UserMessage userMessage = new UserMessage(
 					"What's the weather like in San Francisco, Tokyo, and Paris? Return the temperature in Celsius");
 
-			ChatResponse response = chatModel.call(
-					new Prompt(List.of(userMessage), HunYuanChatOptions.builder().function("weatherFunction").build()));
+			ChatResponse response = chatModel
+				.call(new Prompt(List.of(userMessage), HunYuanChatOptions.builder().toolNames("WeatherInfo").build()));
 
 			logger.info("Response: {}", response);
 
 			assertThat(response.getResult().getOutput().getText()).contains("30", "10", "15");
 
-			// Test weatherFunctionTwo
-			response = chatModel.call(new Prompt(List.of(userMessage),
-					HunYuanChatOptions.builder().function("weatherFunctionTwo").build()));
-
-			logger.info("Response: {}", response);
-
-			assertThat(response.getResult().getOutput().getText()).contains("30", "10", "15");
-
-		});
-	}
-
-	@Test
-	void functionCallWithPortableFunctionCallingOptions() {
-		this.contextRunner.run(context -> {
-
-			HunYuanChatModel chatModel = context.getBean(HunYuanChatModel.class);
-
-			// Test weatherFunction
-			UserMessage userMessage = new UserMessage(
-					"What's the weather like in San Francisco, Tokyo, and Paris? Return the temperature in Celsius");
-
-			FunctionCallingOptions functionOptions = FunctionCallingOptions.builder()
-				.function("weatherFunction")
-				.build();
-
-			ChatResponse response = chatModel.call(new Prompt(List.of(userMessage), functionOptions));
-
-			logger.info("Response: {}", response);
 		});
 	}
 
@@ -114,12 +84,11 @@ class FunctionCallbackWithPlainFunctionBeanIT {
 
 			HunYuanChatModel chatModel = context.getBean(HunYuanChatModel.class);
 
-			// Test weatherFunction
 			UserMessage userMessage = new UserMessage(
 					"What's the weather like in San Francisco, Tokyo, and Paris? Return the temperature in Celsius");
 
 			Flux<ChatResponse> response = chatModel.stream(
-					new Prompt(List.of(userMessage), HunYuanChatOptions.builder().function("weatherFunction").build()));
+					new Prompt(List.of(userMessage), HunYuanChatOptions.builder().toolNames("WeatherInfo").build()));
 
 			String content = response.collectList()
 				.block()
@@ -128,6 +97,7 @@ class FunctionCallbackWithPlainFunctionBeanIT {
 				.flatMap(List::stream)
 				.map(Generation::getOutput)
 				.map(AssistantMessage::getText)
+				.filter(Objects::nonNull)
 				.collect(Collectors.joining());
 			logger.info("Response: {}", content);
 
@@ -135,23 +105,6 @@ class FunctionCallbackWithPlainFunctionBeanIT {
 			assertThat(content).containsAnyOf("10.0", "10");
 			assertThat(content).containsAnyOf("15.0", "15");
 
-			// Test weatherFunctionTwo
-			response = chatModel.stream(new Prompt(List.of(userMessage),
-					HunYuanChatOptions.builder().function("weatherFunctionTwo").build()));
-
-			content = response.collectList()
-				.block()
-				.stream()
-				.map(ChatResponse::getResults)
-				.flatMap(List::stream)
-				.map(Generation::getOutput)
-				.map(AssistantMessage::getText)
-				.collect(Collectors.joining());
-			logger.info("Response: {}", content);
-
-			assertThat(content).containsAnyOf("30.0", "30");
-			assertThat(content).containsAnyOf("10.0", "10");
-			assertThat(content).containsAnyOf("15.0", "15");
 		});
 	}
 
@@ -159,17 +112,12 @@ class FunctionCallbackWithPlainFunctionBeanIT {
 	static class Config {
 
 		@Bean
-		@Description("Get the weather in location")
-		public Function<MockWeatherService.Request, MockWeatherService.Response> weatherFunction() {
-			return new MockWeatherService();
-		}
+		public ToolCallback weatherFunctionInfo() {
 
-		// Relies on the Request's JsonClassDescription annotation to provide the
-		// function description.
-		@Bean
-		public Function<MockWeatherService.Request, MockWeatherService.Response> weatherFunctionTwo() {
-			MockWeatherService weatherService = new MockWeatherService();
-			return (weatherService::apply);
+			return FunctionToolCallback.builder("WeatherInfo", new MockWeatherService())
+				.description("Get the weather in location")
+				.inputType(MockWeatherService.Request.class)
+				.build();
 		}
 
 	}

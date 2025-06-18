@@ -39,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest(classes = HunYuanTestConfiguration.class)
 @EnabledIfEnvironmentVariable(named = "HUNYUAN_SECRET_ID", matches = ".+")
 @EnabledIfEnvironmentVariable(named = "HUNYUAN_SECRET_KEY", matches = ".+")
-class EmbeddingIT{
+class EmbeddingIT {
 
 	private Resource resource = new DefaultResourceLoader().getResource("classpath:text_source.txt");
 

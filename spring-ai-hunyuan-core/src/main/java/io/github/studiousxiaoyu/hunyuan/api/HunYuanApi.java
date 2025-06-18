@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import io.github.studiousxiaoyu.hunyuan.api.auth.ApiAuthHttpRequestInterceptor;
@@ -90,10 +91,11 @@ public class HunYuanApi {
 	 * @param secretKey Hunyuan SecretKey.
 	 */
 	public HunYuanApi(String baseUrl, String secretId, String secretKey) {
-		this(baseUrl, secretId, secretKey, HunYuanConstants.DEFAULT_CHAT_ACTION, RestClient.builder(), RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
+		this(baseUrl, secretId, secretKey, HunYuanConstants.DEFAULT_CHAT_ACTION, RestClient.builder(),
+				RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
 	}
 
-	public HunYuanApi(String baseUrl, String secretId, String secretKey,String action) {
+	public HunYuanApi(String baseUrl, String secretId, String secretKey, String action) {
 		this(baseUrl, secretId, secretKey, action, RestClient.builder(), RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
 	}
 
@@ -104,40 +106,42 @@ public class HunYuanApi {
 	 * @param restClientBuilder RestClient builder.
 	 * @param responseErrorHandler Response error handler.
 	 */
-	public HunYuanApi(String baseUrl, String secretId, String secretKey,RestClient.Builder restClientBuilder,
-					  ResponseErrorHandler responseErrorHandler) {
+	public HunYuanApi(String baseUrl, String secretId, String secretKey, RestClient.Builder restClientBuilder,
+			ResponseErrorHandler responseErrorHandler) {
 
 		Consumer<HttpHeaders> jsonContentHeaders = headers -> {
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			headers.add("X-TC-Action", HunYuanConstants.DEFAULT_CHAT_ACTION);
 		};
 		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey);
-		hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey,HunYuanConstants.DEFAULT_CHAT_HOST,HunYuanConstants.DEFAULT_SERVICE);
+		hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey, HunYuanConstants.DEFAULT_CHAT_HOST,
+				HunYuanConstants.DEFAULT_SERVICE);
 		this.restClient = restClientBuilder.baseUrl(baseUrl)
-				.defaultHeaders(jsonContentHeaders)
-				.defaultStatusHandler(responseErrorHandler)
-				.requestInterceptor(apiAuthHttpRequestInterceptor)
-				.build();
+			.defaultHeaders(jsonContentHeaders)
+			.defaultStatusHandler(responseErrorHandler)
+			.requestInterceptor(apiAuthHttpRequestInterceptor)
+			.build();
 
 		this.webClient = WebClient.builder().baseUrl(baseUrl).defaultHeaders(jsonContentHeaders).build();
 	}
+
 	/**
 	 * Create a new client api.
-	 *
-	 * @param baseUrl              api base URL.
-	 * @param secretKey            Hunyuan api Key.
-	 * @param restClientBuilder    RestClient builder.
+	 * @param baseUrl api base URL.
+	 * @param secretKey Hunyuan api Key.
+	 * @param restClientBuilder RestClient builder.
 	 * @param responseErrorHandler Response error handler.
 	 */
-	public HunYuanApi(String baseUrl, String secretId, String secretKey, String action, RestClient.Builder restClientBuilder,
-                      ResponseErrorHandler responseErrorHandler) {
+	public HunYuanApi(String baseUrl, String secretId, String secretKey, String action,
+			RestClient.Builder restClientBuilder, ResponseErrorHandler responseErrorHandler) {
 
-        Consumer<HttpHeaders> jsonContentHeaders = headers -> {
+		Consumer<HttpHeaders> jsonContentHeaders = headers -> {
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			headers.add("X-TC-Action", action);
 		};
 		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey);
-		hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey,HunYuanConstants.DEFAULT_CHAT_HOST,HunYuanConstants.DEFAULT_SERVICE);
+		hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey, HunYuanConstants.DEFAULT_CHAT_HOST,
+				HunYuanConstants.DEFAULT_SERVICE);
 		this.restClient = restClientBuilder.baseUrl(baseUrl)
 			.defaultHeaders(jsonContentHeaders)
 			.defaultStatusHandler(responseErrorHandler)
@@ -156,8 +160,14 @@ public class HunYuanApi {
 	public ResponseEntity<ChatCompletionResponse> chatCompletionEntity(ChatCompletionRequest chatRequest) {
 
 		Assert.notNull(chatRequest, "The request body can not be null.");
-		ResponseEntity<ChatCompletionResponse> chatCompletionResponse = this.restClient.post().uri("/").body(chatRequest).retrieve().toEntity(ChatCompletionResponse.class);
-		return chatCompletionResponse;
+		ResponseEntity<String> response = this.restClient.post()
+			.uri("/")
+			.body(chatRequest)
+			.retrieve()
+			.toEntity(String.class);
+		ChatCompletionResponse chatCompletionResponse  = ModelOptionsUtils.jsonToObject(
+					response.getBody(), ChatCompletionResponse.class);
+		return ResponseEntity.ok(chatCompletionResponse);
 	}
 
 	/**
@@ -170,11 +180,12 @@ public class HunYuanApi {
 		Assert.notNull(chatRequest, "The request body can not be null.");
 		Assert.isTrue(chatRequest.stream(), "Request must set the steam property to true.");
 		AtomicBoolean isInsideTool = new AtomicBoolean(false);
-		MultiValueMap<String, String> jsonContentHeaders = hunYuanAuthApi.getHttpHeadersConsumerByRequest(HunYuanConstants.DEFAULT_CHAT_ACTION,chatRequest);
+		MultiValueMap<String, String> jsonContentHeaders = hunYuanAuthApi
+			.getHttpHeadersConsumerByRequest(HunYuanConstants.DEFAULT_CHAT_ACTION, chatRequest);
 
 		return this.webClient.post().uri("/").headers(headers -> {
-					headers.addAll(jsonContentHeaders);
-				})
+			headers.addAll(jsonContentHeaders);
+		})
 			.bodyValue(ModelOptionsUtils.toJsonString(chatRequest))
 			.retrieve()
 			.bodyToFlux(String.class)
@@ -216,7 +227,7 @@ public class HunYuanApi {
 			.flatMap(mono -> mono);
 	}
 
-	public <T> EmbeddingList embeddings(EmbeddingRequest<T> embeddingRequest)  {
+	public <T> EmbeddingList embeddings(EmbeddingRequest<T> embeddingRequest) {
 		Assert.notNull(embeddingRequest, "The request body can not be null.");
 
 		// Input text to embed, encoded as a string or array of tokens. To embed multiple
@@ -233,8 +244,12 @@ public class HunYuanApi {
 					list.get(0) instanceof String || list.get(0) instanceof Integer || list.get(0) instanceof List,
 					"The input must be either a String, or a List of Strings or list of list of integers.");
 		}
-		ResponseEntity<EmbeddingResponse> embeddingResponseResponseEntity = this.restClient.post().uri("/")
-				.header("X-TC-Action", HunYuanConstants.DEFAULT_EMBED_ACTION).body(embeddingRequest).retrieve().toEntity(EmbeddingResponse.class);
+		ResponseEntity<EmbeddingResponse> embeddingResponseResponseEntity = this.restClient.post()
+			.uri("/")
+			.header("X-TC-Action", HunYuanConstants.DEFAULT_EMBED_ACTION)
+			.body(embeddingRequest)
+			.retrieve()
+			.toEntity(EmbeddingResponse.class);
 
 		return embeddingResponseResponseEntity.getBody().response();
 	}
@@ -338,6 +353,7 @@ public class HunYuanApi {
 		public String getValue() {
 			return this.value;
 		}
+
 	}
 
 	/**
@@ -948,23 +964,27 @@ public class HunYuanApi {
 	public record EmbeddingRequest<T>(// @formatter:off
 									  @JsonProperty("InputList") T input) { // @formatter:on
 	}
+
 	@JsonInclude(Include.NON_NULL)
 	public record Embedding(// @formatter:off
 							@JsonProperty("Index") Integer index,
 							@JsonProperty("Embedding") float[] embedding,
 							@JsonProperty("Object") String object) { // @formatter:on
 	}
+
 	@JsonInclude(Include.NON_NULL)
 	public record EmbeddingResponse(
-			// @formatter:off
+	// @formatter:off
 			@JsonProperty("Response") EmbeddingList response
 	) {
 		// @formatter:on
 	}
+
 	@JsonInclude(Include.NON_NULL)
 	public record EmbeddingList(// @formatter:off
 								   @JsonProperty("RequestId") String object,
 								   @JsonProperty("Data") List<Embedding> data,
 								   @JsonProperty("Usage") Usage usage) { // @formatter:on
 	}
+
 }

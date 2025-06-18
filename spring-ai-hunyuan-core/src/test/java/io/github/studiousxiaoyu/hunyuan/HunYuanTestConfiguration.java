@@ -41,7 +41,7 @@ public class HunYuanTestConfiguration {
 
 	@Bean
 	public HunYuanChatModel hunYuanChatModel(HunYuanApi hunYuanApi) {
-		return new HunYuanChatModel(hunYuanApi);
+		return HunYuanChatModel.builder().hunYuanApi(hunYuanApi).build();
 	}
 
 	@Bean

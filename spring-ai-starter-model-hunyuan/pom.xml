@@ -6,10 +6,10 @@
     <parent>
         <groupId>io.github.studiousxiaoyu</groupId>
         <artifactId>spring-ai-hunyuan</artifactId>
-        <version>1.0.0-M6.1</version>
+        <version>1.0.0</version>
     </parent>
 
-    <artifactId>spring-ai-hunyuan-starter</artifactId>
+    <artifactId>spring-ai-starter-model-hunyuan</artifactId>
     <name>Spring AI HunYuan Starter</name>
     <packaging>jar</packaging>
     <url>https://github.com/StudiousXiaoYu/spring-ai-hunyuan</url>
@@ -32,14 +32,14 @@
 
         <dependency>
             <groupId>io.github.studiousxiaoyu</groupId>
-            <artifactId>spring-ai-hunyuan-autoconfigure</artifactId>
-            <version>1.0.0-M6.1</version>
+            <artifactId>spring-ai-autoconfigure-model-hunyuan</artifactId>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.studiousxiaoyu</groupId>
             <artifactId>spring-ai-hunyuan-core</artifactId>
-            <version>1.0.0-M6.1</version>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 

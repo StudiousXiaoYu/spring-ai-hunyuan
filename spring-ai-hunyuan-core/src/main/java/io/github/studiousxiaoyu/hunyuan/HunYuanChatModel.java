@@ -43,10 +43,9 @@ import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi.ChatCompletionMessage.*;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanConstants;
 import io.github.studiousxiaoyu.hunyuan.metadata.HunYuanUsage;
 import org.springframework.ai.model.ModelOptionsUtils;
-import org.springframework.ai.model.function.FunctionCallback;
-import org.springframework.ai.model.function.FunctionCallbackResolver;
-import org.springframework.ai.model.function.FunctionCallingOptions;
+import org.springframework.ai.model.tool.*;
 import org.springframework.ai.retry.RetryUtils;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.http.ResponseEntity;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
@@ -54,6 +53,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.MimeType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -64,9 +64,11 @@ import java.util.stream.Collectors;
  *
  * @author Guo Junyu
  */
-public class HunYuanChatModel extends AbstractToolCallSupport implements ChatModel, StreamingChatModel {
+public class HunYuanChatModel implements ChatModel, StreamingChatModel {
 
 	private static final Logger logger = LoggerFactory.getLogger(HunYuanChatModel.class);
+
+	private static final ToolCallingManager DEFAULT_TOOL_CALLING_MANAGER = ToolCallingManager.builder().build();
 
 	private static final ChatModelObservationConvention DEFAULT_OBSERVATION_CONVENTION = new DefaultChatModelObservationConvention();
 
@@ -87,6 +89,10 @@ public class HunYuanChatModel extends AbstractToolCallSupport implements ChatMod
 	 */
 	private final ObservationRegistry observationRegistry;
 
+	private final ToolCallingManager toolCallingManager;
+
+	private final ToolExecutionEligibilityPredicate toolExecutionEligibilityPredicate;
+
 	/**
 	 * Conventions to use for generating observations.
 	 */
@@ -96,33 +102,14 @@ public class HunYuanChatModel extends AbstractToolCallSupport implements ChatMod
 	 * Initializes a new instance of the HunYuanChatModel.
 	 * @param hunYuanApi The HunYuan instance to be used for interacting with the HunYuan
 	 * Chat API.
-	 */
-	public HunYuanChatModel(HunYuanApi hunYuanApi) {
-		this(hunYuanApi, HunYuanChatOptions.builder().model(HunYuanApi.DEFAULT_CHAT_MODEL).build());
-	}
-
-	/**
-	 * Initializes a new instance of the HunYuanChatModel.
-	 * @param hunYuanApi The HunYuan instance to be used for interacting with the HunYuan
-	 * Chat API.
-	 * @param options The HunYuanChatOptions to configure the chat client.
-	 */
-	public HunYuanChatModel(HunYuanApi hunYuanApi, HunYuanChatOptions options) {
-		this(hunYuanApi, options, null, RetryUtils.DEFAULT_RETRY_TEMPLATE);
-	}
-
-	/**
-	 * Initializes a new instance of the HunYuanChatModel.
-	 * @param hunYuanApi The HunYuan instance to be used for interacting with the HunYuan
-	 * Chat API.
-	 * @param options The HunYuanChatOptions to configure the chat client.
-	 * @param functionCallbackResolver The function callback resolver to resolve the
-	 * function by its name.
+	 * @param options The HunYuanChatOptions to configure the chat client. function by its
+	 * name.
 	 * @param retryTemplate The retry template.
 	 */
-	public HunYuanChatModel(HunYuanApi hunYuanApi, HunYuanChatOptions options,
-			FunctionCallbackResolver functionCallbackResolver, RetryTemplate retryTemplate) {
-		this(hunYuanApi, options, functionCallbackResolver, List.of(), retryTemplate, ObservationRegistry.NOOP);
+	public HunYuanChatModel(HunYuanApi hunYuanApi, HunYuanChatOptions options, ToolCallingManager toolCallingManager,
+			RetryTemplate retryTemplate, ObservationRegistry observationRegistry) {
+		this(hunYuanApi, options, toolCallingManager, retryTemplate, observationRegistry,
+				new DefaultToolExecutionEligibilityPredicate());
 	}
 
 	/**
@@ -130,25 +117,24 @@ public class HunYuanChatModel extends AbstractToolCallSupport implements ChatMod
 	 * @param hunYuanApi The HunYuan instance to be used for interacting with the HunYuan
 	 * Chat API.
 	 * @param options The HunYuanChatOptions to configure the chat client.
-	 * @param functionCallbackResolver resolves the function by its name.
-	 * @param toolFunctionCallbacks The tool function callbacks.
 	 * @param retryTemplate The retry template.
 	 * @param observationRegistry The ObservationRegistry used for instrumentation.
 	 */
-	public HunYuanChatModel(HunYuanApi hunYuanApi, HunYuanChatOptions options,
-			FunctionCallbackResolver functionCallbackResolver, List<FunctionCallback> toolFunctionCallbacks,
-			RetryTemplate retryTemplate, ObservationRegistry observationRegistry) {
-		super(functionCallbackResolver, options, toolFunctionCallbacks);
+	public HunYuanChatModel(HunYuanApi hunYuanApi, HunYuanChatOptions options, ToolCallingManager toolCallingManager,
+			RetryTemplate retryTemplate, ObservationRegistry observationRegistry,
+			ToolExecutionEligibilityPredicate toolExecutionEligibilityPredicate) {
 		Assert.notNull(hunYuanApi, "HunYuanApi must not be null");
 		Assert.notNull(options, "Options must not be null");
+		Assert.notNull(toolCallingManager, "toolCallingManager cannot be null");
 		Assert.notNull(retryTemplate, "RetryTemplate must not be null");
-		Assert.isTrue(CollectionUtils.isEmpty(options.getFunctionCallbacks()),
-				"The default function callbacks must be set via the toolFunctionCallbacks constructor parameter");
 		Assert.notNull(observationRegistry, "ObservationRegistry must not be null");
+		Assert.notNull(toolExecutionEligibilityPredicate, "toolExecutionEligibilityPredicate cannot be null");
 		this.hunYuanApi = hunYuanApi;
 		this.defaultOptions = options;
+		this.toolCallingManager = toolCallingManager;
 		this.retryTemplate = retryTemplate;
 		this.observationRegistry = observationRegistry;
+		this.toolExecutionEligibilityPredicate = toolExecutionEligibilityPredicate;
 	}
 
 	private static Generation buildGeneration(Choice choice, Map<String, Object> metadata) {
@@ -166,14 +152,75 @@ public class HunYuanChatModel extends AbstractToolCallSupport implements ChatMod
 		return new Generation(assistantMessage, generationMetadata);
 	}
 
+	Prompt buildRequestPrompt(Prompt prompt) {
+		// Process runtime options
+		HunYuanChatOptions runtimeOptions = null;
+		if (prompt.getOptions() != null) {
+			if (prompt.getOptions() instanceof ToolCallingChatOptions toolCallingChatOptions) {
+				runtimeOptions = ModelOptionsUtils.copyToTarget(toolCallingChatOptions, ToolCallingChatOptions.class,
+						HunYuanChatOptions.class);
+			}
+			else {
+				runtimeOptions = ModelOptionsUtils.copyToTarget(prompt.getOptions(), ChatOptions.class,
+						HunYuanChatOptions.class);
+			}
+		}
+
+		// Define request options by merging runtime options and default options
+		HunYuanChatOptions requestOptions = ModelOptionsUtils.merge(runtimeOptions, this.defaultOptions,
+				HunYuanChatOptions.class);
+
+		// Merge @JsonIgnore-annotated options explicitly since they are ignored by
+		// Jackson, used by ModelOptionsUtils.
+		if (runtimeOptions != null) {
+			if (runtimeOptions.getTopK() != null) {
+				logger.warn("The topK option is not supported by OpenAI chat models. Ignoring.");
+			}
+
+			requestOptions.setHttpHeaders(
+					mergeHttpHeaders(runtimeOptions.getHttpHeaders(), this.defaultOptions.getHttpHeaders()));
+			requestOptions.setInternalToolExecutionEnabled(
+					ModelOptionsUtils.mergeOption(runtimeOptions.getInternalToolExecutionEnabled(),
+							this.defaultOptions.getInternalToolExecutionEnabled()));
+			requestOptions.setToolNames(ToolCallingChatOptions.mergeToolNames(runtimeOptions.getToolNames(),
+					this.defaultOptions.getToolNames()));
+			requestOptions.setToolCallbacks(ToolCallingChatOptions.mergeToolCallbacks(runtimeOptions.getToolCallbacks(),
+					this.defaultOptions.getToolCallbacks()));
+			requestOptions.setToolContext(ToolCallingChatOptions.mergeToolContext(runtimeOptions.getToolContext(),
+					this.defaultOptions.getToolContext()));
+		}
+		else {
+			requestOptions.setHttpHeaders(this.defaultOptions.getHttpHeaders());
+			requestOptions.setInternalToolExecutionEnabled(this.defaultOptions.getInternalToolExecutionEnabled());
+			requestOptions.setToolNames(this.defaultOptions.getToolNames());
+			requestOptions.setToolCallbacks(this.defaultOptions.getToolCallbacks());
+			requestOptions.setToolContext(this.defaultOptions.getToolContext());
+		}
+
+		ToolCallingChatOptions.validateToolCallbacks(requestOptions.getToolCallbacks());
+
+		return new Prompt(prompt.getInstructions(), requestOptions);
+	}
+
+	private Map<String, String> mergeHttpHeaders(Map<String, String> runtimeHttpHeaders,
+			Map<String, String> defaultHttpHeaders) {
+		var mergedHttpHeaders = new HashMap<>(defaultHttpHeaders);
+		mergedHttpHeaders.putAll(runtimeHttpHeaders);
+		return mergedHttpHeaders;
+	}
+
 	@Override
 	public ChatResponse call(Prompt prompt) {
+		Prompt requestPrompt = buildRequestPrompt(prompt);
+		return this.internalCall(requestPrompt, null);
+	}
+
+	public ChatResponse internalCall(Prompt prompt, ChatResponse previousChatResponse) {
 		ChatCompletionRequest request = createRequest(prompt, false);
 
 		ChatModelObservationContext observationContext = ChatModelObservationContext.builder()
 			.prompt(prompt)
 			.provider(HunYuanConstants.PROVIDER_NAME)
-			.requestOptions(buildRequestOptions(request))
 			.build();
 
 		ChatResponse response = ChatModelObservationDocumentation.CHAT_MODEL_OPERATION
@@ -198,12 +245,12 @@ public class HunYuanChatModel extends AbstractToolCallSupport implements ChatMod
 
 				List<Generation> generations = choices.stream().map(choice -> {
 			// @formatter:off
-					Map<String, Object> metadata = Map.of(
-							"id", chatCompletion.id(),
-							"role", choice.message().role() != null ? choice.message().role().name() : "",
-							"finishReason", choice.finishReason() != null ? choice.finishReason() : ""
-					);
-					// @formatter:on
+						Map<String, Object> metadata = Map.of(
+								"id", chatCompletion.id(),
+								"role", choice.message().role() != null ? choice.message().role().name() : "",
+								"finishReason", choice.finishReason() != null ? choice.finishReason() : ""
+						);
+						// @formatter:on
 					return buildGeneration(choice, metadata);
 				}).toList();
 
@@ -215,13 +262,20 @@ public class HunYuanChatModel extends AbstractToolCallSupport implements ChatMod
 				return chatResponse;
 			});
 
-		if (!isProxyToolCalls(prompt, this.defaultOptions)
-				&& isToolCall(response, Set.of(HunYuanApi.ChatCompletionFinishReason.TOOL_CALLS.getJsonValue(),
-						HunYuanApi.ChatCompletionFinishReason.STOP.name()))) {
-			var toolCallConversation = handleToolCalls(prompt, response);
-			// Recursively call the call method with the tool call message
-			// conversation that contains the call responses.
-			return this.call(new Prompt(toolCallConversation, prompt.getOptions()));
+		if (this.toolExecutionEligibilityPredicate.isToolExecutionRequired(prompt.getOptions(), response)) {
+			var toolExecutionResult = this.toolCallingManager.executeToolCalls(prompt, response);
+			if (toolExecutionResult.returnDirect()) {
+				// Return tool execution result directly to the client.
+				return ChatResponse.builder()
+					.from(response)
+					.generations(ToolExecutionResult.buildGenerations(toolExecutionResult))
+					.build();
+			}
+			else {
+				// Send the tool execution result back to the model.
+				return this.internalCall(new Prompt(toolExecutionResult.conversationHistory(), prompt.getOptions()),
+						response);
+			}
 		}
 		return response;
 	}
@@ -233,6 +287,11 @@ public class HunYuanChatModel extends AbstractToolCallSupport implements ChatMod
 
 	@Override
 	public Flux<ChatResponse> stream(Prompt prompt) {
+		Prompt requestPrompt = buildRequestPrompt(prompt);
+		return internalStream(requestPrompt, null);
+	}
+
+	public Flux<ChatResponse> internalStream(Prompt prompt, ChatResponse previousChatResponse) {
 		return Flux.deferContextual(contextView -> {
 			ChatCompletionRequest request = createRequest(prompt, true);
 
@@ -246,7 +305,6 @@ public class HunYuanChatModel extends AbstractToolCallSupport implements ChatMod
 			final ChatModelObservationContext observationContext = ChatModelObservationContext.builder()
 				.prompt(prompt)
 				.provider(HunYuanConstants.PROVIDER_NAME)
-				.requestOptions(buildRequestOptions(request))
 				.build();
 
 			Observation observation = ChatModelObservationDocumentation.CHAT_MODEL_OPERATION.observation(
@@ -268,12 +326,12 @@ public class HunYuanChatModel extends AbstractToolCallSupport implements ChatMod
 							}
 
 				// @formatter:off
-							Map<String, Object> metadata = Map.of(
-								"id", chatCompletion2.id(),
-								"role", roleMap.getOrDefault(id, ""),
-								"finishReason", choice.finishReason() != null ? choice.finishReason() : ""
-							);
-							// @formatter:on
+								Map<String, Object> metadata = Map.of(
+										"id", chatCompletion2.id(),
+										"role", roleMap.getOrDefault(id, ""),
+										"finishReason", choice.finishReason() != null ? choice.finishReason() : ""
+								);
+								// @formatter:on
 							return buildGeneration(choice, metadata);
 						}).toList();
 
@@ -287,15 +345,27 @@ public class HunYuanChatModel extends AbstractToolCallSupport implements ChatMod
 				}));
 
 			Flux<ChatResponse> flux = chatResponse.flatMap(response -> {
-				if (!isProxyToolCalls(prompt, this.defaultOptions)
-						&& isToolCall(response, Set.of(ChatCompletionFinishReason.TOOL_CALLS.getJsonValue(),
-								ChatCompletionFinishReason.STOP.getJsonValue()))) {
-					var toolCallConversation = handleToolCalls(prompt, response);
-					// Recursively call the stream method with the tool call message
-					// conversation that contains the call responses.
-					return this.stream(new Prompt(toolCallConversation, prompt.getOptions()));
+				if (this.toolExecutionEligibilityPredicate.isToolExecutionRequired(prompt.getOptions(), response)) {
+					return Flux.defer(() -> {
+						var toolExecutionResult = this.toolCallingManager.executeToolCalls(prompt, response);
+						if (toolExecutionResult.returnDirect()) {
+							// Return tool execution result directly to the client.
+							return Flux.just(ChatResponse.builder()
+								.from(response)
+								.generations(ToolExecutionResult.buildGenerations(toolExecutionResult))
+								.build());
+						}
+						else {
+							// Send the tool execution result back to the model.
+							return this.internalStream(
+									new Prompt(toolExecutionResult.conversationHistory(), prompt.getOptions()),
+									response);
+						}
+					}).subscribeOn(Schedulers.boundedElastic());
 				}
-				return Flux.just(response);
+				else {
+					return Flux.just(response);
+				}
 			})
 				.doOnError(observation::error)
 				.doFinally(signalType -> observation.stop())
@@ -401,35 +471,14 @@ public class HunYuanChatModel extends AbstractToolCallSupport implements ChatMod
 		});
 		ChatCompletionRequest request = new ChatCompletionRequest(chatCompletionMessages, stream);
 
-		Set<String> enabledToolsToUse = new HashSet<>();
+		HunYuanChatOptions requestOptions = (HunYuanChatOptions) prompt.getOptions();
+		request = ModelOptionsUtils.merge(requestOptions, request, ChatCompletionRequest.class);
 
-		if (prompt.getOptions() != null) {
-			HunYuanChatOptions updatedRuntimeOptions;
-
-			if (prompt.getOptions() instanceof FunctionCallingOptions functionCallingOptions) {
-				updatedRuntimeOptions = ModelOptionsUtils.copyToTarget(functionCallingOptions,
-						FunctionCallingOptions.class, HunYuanChatOptions.class);
-			}
-			else {
-				updatedRuntimeOptions = ModelOptionsUtils.copyToTarget(prompt.getOptions(), ChatOptions.class,
-						HunYuanChatOptions.class);
-			}
-			enabledToolsToUse.addAll(this.runtimeFunctionCallbackConfigurations(updatedRuntimeOptions));
-
-			request = ModelOptionsUtils.merge(updatedRuntimeOptions, request, ChatCompletionRequest.class);
-		}
-
-		if (!CollectionUtils.isEmpty(this.defaultOptions.getFunctions())) {
-			enabledToolsToUse.addAll(this.defaultOptions.getFunctions());
-		}
-
-		request = ModelOptionsUtils.merge(request, this.defaultOptions, ChatCompletionRequest.class);
-
-		// Add the enabled functions definitions to the request's tools parameter.
-		if (!CollectionUtils.isEmpty(enabledToolsToUse)) {
-
+		// Add the tool definitions to the request's tools parameter.
+		List<ToolDefinition> toolDefinitions = this.toolCallingManager.resolveToolDefinitions(requestOptions);
+		if (!CollectionUtils.isEmpty(toolDefinitions)) {
 			request = ModelOptionsUtils.merge(
-					HunYuanChatOptions.builder().tools(this.getFunctionTools(enabledToolsToUse)).build(), request,
+					HunYuanChatOptions.builder().tools(this.getFunctionTools(toolDefinitions)).build(), request,
 					ChatCompletionRequest.class);
 		}
 
@@ -464,16 +513,104 @@ public class HunYuanChatModel extends AbstractToolCallSupport implements ChatMod
 			.build();
 	}
 
-	private List<FunctionTool> getFunctionTools(Set<String> functionNames) {
-		return this.resolveFunctionCallbacks(functionNames).stream().map(functionCallback -> {
-			var function = new FunctionTool.Function(functionCallback.getDescription(), functionCallback.getName(),
-					functionCallback.getInputTypeSchema());
-			return new FunctionTool(function);
+	private List<HunYuanApi.FunctionTool> getFunctionTools(List<ToolDefinition> toolDefinitions) {
+		return toolDefinitions.stream().map(toolDefinition -> {
+			var function = new HunYuanApi.FunctionTool.Function(toolDefinition.description(), toolDefinition.name(),
+					toolDefinition.inputSchema());
+			return new HunYuanApi.FunctionTool(function);
 		}).toList();
 	}
 
 	public void setObservationConvention(ChatModelObservationConvention observationConvention) {
 		this.observationConvention = observationConvention;
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	/**
+	 * Returns a builder pre-populated with the current configuration for mutation.
+	 */
+	public Builder mutate() {
+		return new Builder(this);
+	}
+
+	@Override
+	public HunYuanChatModel clone() {
+		return this.mutate().build();
+	}
+
+	public static final class Builder {
+
+		// Copy constructor for mutate()
+		public Builder(HunYuanChatModel model) {
+			this.hunYuanApi = model.hunYuanApi;
+			this.defaultOptions = model.defaultOptions;
+			this.toolCallingManager = model.toolCallingManager;
+			this.toolExecutionEligibilityPredicate = model.toolExecutionEligibilityPredicate;
+			this.retryTemplate = model.retryTemplate;
+			this.observationRegistry = model.observationRegistry;
+		}
+
+		private HunYuanApi hunYuanApi;
+
+		private HunYuanChatOptions defaultOptions = HunYuanChatOptions.builder()
+			.model(HunYuanApi.DEFAULT_CHAT_MODEL)
+			.temperature(0.7)
+			.build();
+
+		private ToolCallingManager toolCallingManager;
+
+		private ToolExecutionEligibilityPredicate toolExecutionEligibilityPredicate = new DefaultToolExecutionEligibilityPredicate();
+
+		private RetryTemplate retryTemplate = RetryUtils.DEFAULT_RETRY_TEMPLATE;
+
+		private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
+
+		private Builder() {
+		}
+
+		public Builder hunYuanApi(HunYuanApi hunYuanApi) {
+			this.hunYuanApi = hunYuanApi;
+			return this;
+		}
+
+		public Builder defaultOptions(HunYuanChatOptions defaultOptions) {
+			this.defaultOptions = defaultOptions;
+			return this;
+		}
+
+		public Builder toolCallingManager(ToolCallingManager toolCallingManager) {
+			this.toolCallingManager = toolCallingManager;
+			return this;
+		}
+
+		public Builder toolExecutionEligibilityPredicate(
+				ToolExecutionEligibilityPredicate toolExecutionEligibilityPredicate) {
+			this.toolExecutionEligibilityPredicate = toolExecutionEligibilityPredicate;
+			return this;
+		}
+
+		public Builder retryTemplate(RetryTemplate retryTemplate) {
+			this.retryTemplate = retryTemplate;
+			return this;
+		}
+
+		public Builder observationRegistry(ObservationRegistry observationRegistry) {
+			this.observationRegistry = observationRegistry;
+			return this;
+		}
+
+		public HunYuanChatModel build() {
+			if (this.toolCallingManager != null) {
+				return new HunYuanChatModel(this.hunYuanApi, this.defaultOptions, this.toolCallingManager,
+						this.retryTemplate, this.observationRegistry, this.toolExecutionEligibilityPredicate);
+			}
+			return new HunYuanChatModel(this.hunYuanApi, this.defaultOptions, DEFAULT_TOOL_CALLING_MANAGER,
+					this.retryTemplate, this.observationRegistry, this.toolExecutionEligibilityPredicate);
+		}
+
 	}
 
 }

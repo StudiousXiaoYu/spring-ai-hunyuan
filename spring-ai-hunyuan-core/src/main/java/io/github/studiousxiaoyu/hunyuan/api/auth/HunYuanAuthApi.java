@@ -27,20 +27,24 @@ import static io.github.studiousxiaoyu.hunyuan.api.HunYuanConstants.CT_JSON;
  * for the HunYuan API. It provides methods to generate necessary headers and signatures
  * required for authenticated requests.
  *
- * @author Your Name
+ * @author Guo Junyu
  */
 public class HunYuanAuthApi {
 
 	private static final Logger logger = LoggerFactory.getLogger(HunYuanAuthApi.class);
 
 	private final static Charset UTF8 = StandardCharsets.UTF_8;
+
 	private final static String VERSION = HunYuanConstants.DEFAULT_VERSION;
+
 	private final static String ALGORITHM = HunYuanConstants.DEFAULT_ALGORITHM;
 
 	private final String secretId;
 
 	private final String secretKey;
+
 	private final String host;
+
 	private final String service;
 
 	/**
@@ -48,7 +52,7 @@ public class HunYuanAuthApi {
 	 * @param secretId The secret ID used for authentication.
 	 * @param secretKey The secret key used for authentication.
 	 */
-	public HunYuanAuthApi(String secretId, String secretKey, String host,String service) {
+	public HunYuanAuthApi(String secretId, String secretKey, String host, String service) {
 		this.secretId = secretId;
 		this.secretKey = secretKey;
 		this.host = host;
@@ -144,8 +148,9 @@ public class HunYuanAuthApi {
 				headers.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> List.of(e.getValue()))));
 	}
 
-	public MultiValueMap<String, String> getHttpHeadersConsumerByRequest(String action, HunYuanApi.ChatCompletionRequest chatRequest) {
-		return getHttpHeadersConsumer(action,ModelOptionsUtils.toJsonString(chatRequest).getBytes(UTF8));
+	public MultiValueMap<String, String> getHttpHeadersConsumerByRequest(String action,
+			HunYuanApi.ChatCompletionRequest chatRequest) {
+		return getHttpHeadersConsumer(action, ModelOptionsUtils.toJsonString(chatRequest).getBytes(UTF8));
 	}
 
 }

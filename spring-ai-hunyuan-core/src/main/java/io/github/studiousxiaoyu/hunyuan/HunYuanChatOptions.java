@@ -21,8 +21,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
-import org.springframework.ai.model.function.FunctionCallback;
-import org.springframework.ai.model.function.FunctionCallingOptions;
+import org.springframework.ai.model.ModelOptionsUtils;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -33,7 +35,7 @@ import java.util.*;
  * @author Guo Junyu
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class HunYuanChatOptions implements FunctionCallingOptions {
+public class HunYuanChatOptions implements ToolCallingChatOptions {
 
 	private @JsonProperty("Model") String model;
 
@@ -77,49 +79,32 @@ public class HunYuanChatOptions implements FunctionCallingOptions {
 	 * by the ChatModel chat completion requests.
 	 */
 	@JsonIgnore
-	private List<FunctionCallback> functionCallbacks = new ArrayList<>();
+	private List<ToolCallback> toolCallbacks = new ArrayList<>();
 
 	/**
-	 * List of functions, identified by their names, to configure for function calling in
-	 * the chat completion requests. Functions with those names must exist in the
-	 * functionCallbacks registry. The {@link #functionCallbacks} from the PromptOptions
-	 * are automatically enabled for the duration of the prompt execution.
-	 *
-	 * Note that function enabled with the default options are enabled for all chat
-	 * completion requests. This could impact the token count and the billing. If the
-	 * functions is set in a prompt options, then the enabled functions are only active
-	 * for the duration of this prompt execution.
+	 * Collection of tool names to be resolved at runtime and used for tool calling in the
+	 * chat completion requests.
 	 */
 	@JsonIgnore
-	private Set<String> functions = new HashSet<>();
+	private Set<String> toolNames = new HashSet<>();
+
+	/**
+	 * Whether to enable the tool execution lifecycle internally in ChatModel.
+	 */
+	@JsonIgnore
+	private Boolean internalToolExecutionEnabled;
+
+	/**
+	 * Optional HTTP headers to be added to the chat completion request.
+	 */
+	@JsonIgnore
+	private Map<String, String> httpHeaders = new HashMap<>();
 
 	@JsonIgnore
-	private Boolean proxyToolCalls;
-
-	@JsonIgnore
-	private Map<String, Object> toolContext;
+	private Map<String, Object> toolContext = new HashMap<>();
 
 	public static Builder builder() {
 		return new Builder();
-	}
-
-	@Override
-	public List<FunctionCallback> getFunctionCallbacks() {
-		return this.functionCallbacks;
-	}
-
-	@Override
-	public void setFunctionCallbacks(List<FunctionCallback> functionCallbacks) {
-		this.functionCallbacks = functionCallbacks;
-	}
-
-	@Override
-	public Set<String> getFunctions() {
-		return this.functions;
-	}
-
-	public void setFunctions(Set<String> functionNames) {
-		this.functions = functionNames;
 	}
 
 	@Override
@@ -299,15 +284,6 @@ public class HunYuanChatOptions implements FunctionCallingOptions {
 	}
 
 	@Override
-	public Boolean getProxyToolCalls() {
-		return this.proxyToolCalls;
-	}
-
-	public void setProxyToolCalls(Boolean proxyToolCalls) {
-		this.proxyToolCalls = proxyToolCalls;
-	}
-
-	@Override
 	public Map<String, Object> getToolContext() {
 		return this.toolContext;
 	}
@@ -318,204 +294,204 @@ public class HunYuanChatOptions implements FunctionCallingOptions {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
+	@JsonIgnore
+	public List<ToolCallback> getToolCallbacks() {
+		return toolCallbacks;
+	}
+
+	@Override
+	@JsonIgnore
+	public void setToolCallbacks(List<ToolCallback> toolCallbacks) {
+		Assert.notNull(toolCallbacks, "toolCallbacks cannot be null");
+		Assert.noNullElements(toolCallbacks, "toolCallbacks cannot contain null elements");
+		this.toolCallbacks = toolCallbacks;
+	}
+
+	@Override
+	@JsonIgnore
+	public Set<String> getToolNames() {
+		return toolNames;
+	}
+
+	@Override
+	@JsonIgnore
+	public void setToolNames(Set<String> toolNames) {
+		Assert.notNull(toolNames, "toolNames cannot be null");
+		Assert.noNullElements(toolNames, "toolNames cannot contain null elements");
+		toolNames.forEach(tool -> Assert.hasText(tool, "toolNames cannot contain empty elements"));
+		this.toolNames = toolNames;
+	}
+
+	@Override
+	@JsonIgnore
+	public Boolean getInternalToolExecutionEnabled() {
+		return internalToolExecutionEnabled;
+	}
+
+	@Override
+	@JsonIgnore
+	public void setInternalToolExecutionEnabled(Boolean internalToolExecutionEnabled) {
+		this.internalToolExecutionEnabled = internalToolExecutionEnabled;
+	}
+
+	public Map<String, String> getHttpHeaders() {
+		return httpHeaders;
+	}
+
+	public void setHttpHeaders(Map<String, String> httpHeaders) {
+		this.httpHeaders = httpHeaders;
+	}
+
+	@Override
+	public final boolean equals(Object o) {
+		if (!(o instanceof HunYuanChatOptions that))
 			return false;
 
-		HunYuanChatOptions that = (HunYuanChatOptions) o;
-
-		if (!model.equals(that.model))
-			return false;
-		if (!Objects.equals(temperature, that.temperature))
-			return false;
-		if (!Objects.equals(topP, that.topP))
-			return false;
-		if (!Objects.equals(seed, that.seed))
-			return false;
-		if (!Objects.equals(enableEnhancement, that.enableEnhancement))
-			return false;
-		if (!Objects.equals(streamModeration, that.streamModeration))
-			return false;
-		if (!Objects.equals(stop, that.stop))
-			return false;
-		if (!Objects.equals(tools, that.tools))
-			return false;
-		if (!Objects.equals(toolChoice, that.toolChoice))
-			return false;
-		if (!Objects.equals(customTool, that.customTool))
-			return false;
-		if (!Objects.equals(searchInfo, that.searchInfo))
-			return false;
-		if (!Objects.equals(citation, that.citation))
-			return false;
-		if (!Objects.equals(enableSpeedSearch, that.enableSpeedSearch))
-			return false;
-		if (!Objects.equals(enableMultimedia, that.enableMultimedia))
-			return false;
-		if (!Objects.equals(enableDeepSearch, that.enableDeepSearch))
-			return false;
-		if (!Objects.equals(ForceSearchEnhancement, that.ForceSearchEnhancement))
-			return false;
-		if (!Objects.equals(enableRecommendedQuestions, that.enableRecommendedQuestions))
-			return false;
-		if (!Objects.equals(functionCallbacks, that.functionCallbacks))
-			return false;
-		if (!Objects.equals(functions, that.functions))
-			return false;
-		if (!Objects.equals(proxyToolCalls, that.proxyToolCalls))
-			return false;
-		return Objects.equals(toolContext, that.toolContext);
+		return Objects.equals(model, that.model) && Objects.equals(temperature, that.temperature)
+				&& Objects.equals(topP, that.topP) && Objects.equals(seed, that.seed)
+				&& Objects.equals(enableEnhancement, that.enableEnhancement)
+				&& Objects.equals(streamModeration, that.streamModeration) && Objects.equals(stop, that.stop)
+				&& Objects.equals(tools, that.tools) && Objects.equals(toolChoice, that.toolChoice)
+				&& Objects.equals(customTool, that.customTool) && Objects.equals(searchInfo, that.searchInfo)
+				&& Objects.equals(citation, that.citation) && Objects.equals(enableSpeedSearch, that.enableSpeedSearch)
+				&& Objects.equals(enableMultimedia, that.enableMultimedia)
+				&& Objects.equals(enableDeepSearch, that.enableDeepSearch)
+				&& Objects.equals(ForceSearchEnhancement, that.ForceSearchEnhancement)
+				&& Objects.equals(enableRecommendedQuestions, that.enableRecommendedQuestions)
+				&& Objects.equals(toolCallbacks, that.toolCallbacks) && Objects.equals(toolNames, that.toolNames)
+				&& Objects.equals(internalToolExecutionEnabled, that.internalToolExecutionEnabled)
+				&& Objects.equals(httpHeaders, that.httpHeaders) && Objects.equals(toolContext, that.toolContext);
 	}
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (temperature != null ? temperature.hashCode() : 0);
-		result = prime * result + (topP != null ? topP.hashCode() : 0);
-		result = prime * result + (seed != null ? seed.hashCode() : 0);
-		result = prime * result + (enableEnhancement != null ? enableEnhancement.hashCode() : 0);
-		result = prime * result + (streamModeration != null ? streamModeration.hashCode() : 0);
-		result = prime * result + (stop != null ? stop.hashCode() : 0);
-		result = prime * result + (tools != null ? tools.hashCode() : 0);
-		result = prime * result + (toolChoice != null ? toolChoice.hashCode() : 0);
-		result = prime * result + (customTool != null ? customTool.hashCode() : 0);
-		result = prime * result + (searchInfo != null ? searchInfo.hashCode() : 0);
-		result = prime * result + (citation != null ? citation.hashCode() : 0);
-		result = prime * result + (enableSpeedSearch != null ? enableSpeedSearch.hashCode() : 0);
-		result = prime * result + (enableMultimedia != null ? enableMultimedia.hashCode() : 0);
-		result = prime * result + (enableDeepSearch != null ? enableDeepSearch.hashCode() : 0);
-		result = prime * result + (ForceSearchEnhancement != null ? ForceSearchEnhancement.hashCode() : 0);
-		result = prime * result + (enableRecommendedQuestions != null ? enableRecommendedQuestions.hashCode() : 0);
-		result = prime * result + (functionCallbacks != null ? functionCallbacks.hashCode() : 0);
-		result = prime * result + (functions != null ? functions.hashCode() : 0);
-		result = prime * result + (proxyToolCalls != null ? proxyToolCalls.hashCode() : 0);
-		result = prime * result + (toolContext != null ? toolContext.hashCode() : 0);
+		int result = Objects.hashCode(model);
+		result = 31 * result + Objects.hashCode(temperature);
+		result = 31 * result + Objects.hashCode(topP);
+		result = 31 * result + Objects.hashCode(seed);
+		result = 31 * result + Objects.hashCode(enableEnhancement);
+		result = 31 * result + Objects.hashCode(streamModeration);
+		result = 31 * result + Objects.hashCode(stop);
+		result = 31 * result + Objects.hashCode(tools);
+		result = 31 * result + Objects.hashCode(toolChoice);
+		result = 31 * result + Objects.hashCode(customTool);
+		result = 31 * result + Objects.hashCode(searchInfo);
+		result = 31 * result + Objects.hashCode(citation);
+		result = 31 * result + Objects.hashCode(enableSpeedSearch);
+		result = 31 * result + Objects.hashCode(enableMultimedia);
+		result = 31 * result + Objects.hashCode(enableDeepSearch);
+		result = 31 * result + Objects.hashCode(ForceSearchEnhancement);
+		result = 31 * result + Objects.hashCode(enableRecommendedQuestions);
+		result = 31 * result + Objects.hashCode(toolCallbacks);
+		result = 31 * result + Objects.hashCode(toolNames);
+		result = 31 * result + Objects.hashCode(internalToolExecutionEnabled);
+		result = 31 * result + Objects.hashCode(httpHeaders);
+		result = 31 * result + Objects.hashCode(toolContext);
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "HunYuanChatOptions: " + ModelOptionsUtils.toJsonString(this);
 	}
 
 	public static class Builder {
 
-		private final HunYuanChatOptions options = new HunYuanChatOptions();
+		protected HunYuanChatOptions options;
+
+		public Builder() {
+			this.options = new HunYuanChatOptions();
+		}
+
+		public Builder(HunYuanChatOptions options) {
+			this.options = options;
+		}
 
 		public Builder model(String model) {
-			options.setModel(model);
+			this.options.model = model;
 			return this;
 		}
 
-		public Builder temperature(Double temperature) {
-			options.setTemperature(temperature);
-			return this;
-		}
-
-		public Builder topP(Double topP) {
-			options.setTopP(topP);
+		public Builder model(HunYuanApi.ChatModel hunYuanChatModel) {
+			this.options.model = hunYuanChatModel.getName();
 			return this;
 		}
 
 		public Builder seed(Integer seed) {
-			options.setSeed(seed);
-			return this;
-		}
-
-		public Builder enableEnhancement(Boolean enableEnhancement) {
-			options.setEnableEnhancement(enableEnhancement);
-			return this;
-		}
-
-		public Builder streamModeration(Boolean streamModeration) {
-			options.setStreamModeration(streamModeration);
+			this.options.seed = seed;
 			return this;
 		}
 
 		public Builder stop(List<String> stop) {
-			options.setStop(stop);
+			this.options.stop = stop;
+			return this;
+		}
+
+		public Builder temperature(Double temperature) {
+			this.options.temperature = temperature;
+			return this;
+		}
+
+		public Builder topP(Double topP) {
+			this.options.topP = topP;
 			return this;
 		}
 
 		public Builder tools(List<HunYuanApi.FunctionTool> tools) {
-			options.setTools(tools);
+			this.options.tools = tools;
 			return this;
 		}
 
 		public Builder toolChoice(String toolChoice) {
-			options.setToolChoice(toolChoice);
+			this.options.toolChoice = toolChoice;
 			return this;
 		}
 
-		public Builder customTool(HunYuanApi.FunctionTool customTool) {
-			options.setCustomTool(customTool);
+		public Builder toolCallbacks(List<ToolCallback> toolCallbacks) {
+			this.options.setToolCallbacks(toolCallbacks);
 			return this;
 		}
 
-		public Builder searchInfo(Boolean searchInfo) {
-			options.setSearchInfo(searchInfo);
+		public Builder toolCallbacks(ToolCallback... toolCallbacks) {
+			Assert.notNull(toolCallbacks, "toolCallbacks cannot be null");
+			this.options.toolCallbacks.addAll(Arrays.asList(toolCallbacks));
 			return this;
 		}
 
-		public Builder citation(Boolean citation) {
-			options.setCitation(citation);
+		public Builder toolNames(Set<String> toolNames) {
+			Assert.notNull(toolNames, "toolNames cannot be null");
+			this.options.setToolNames(toolNames);
 			return this;
 		}
 
-		public Builder enableSpeedSearch(Boolean enableSpeedSearch) {
-			options.setEnableSpeedSearch(enableSpeedSearch);
+		public Builder toolNames(String... toolNames) {
+			Assert.notNull(toolNames, "toolNames cannot be null");
+			this.options.toolNames.addAll(Set.of(toolNames));
 			return this;
 		}
 
-		public Builder enableMultimedia(Boolean enableMultimedia) {
-			options.setEnableMultimedia(enableMultimedia);
+		public Builder internalToolExecutionEnabled(@Nullable Boolean internalToolExecutionEnabled) {
+			this.options.setInternalToolExecutionEnabled(internalToolExecutionEnabled);
 			return this;
 		}
 
-		public Builder enableDeepSearch(Boolean enableDeepSearch) {
-			options.setEnableDeepSearch(enableDeepSearch);
-			return this;
-		}
-
-		public Builder forceSearchEnhancement(Boolean forceSearchEnhancement) {
-			options.setForceSearchEnhancement(forceSearchEnhancement);
-			return this;
-		}
-
-		public Builder enableRecommendedQuestions(Boolean enableRecommendedQuestions) {
-			options.setEnableRecommendedQuestions(enableRecommendedQuestions);
-			return this;
-		}
-
-		public Builder functionCallbacks(List<FunctionCallback> functionCallbacks) {
-			options.setFunctionCallbacks(functionCallbacks);
-			return this;
-		}
-
-		public Builder functions(Set<String> functions) {
-			options.setFunctions(functions);
-			return this;
-		}
-
-		public Builder function(String functionName) {
-			Assert.hasText(functionName, "Function name must not be empty");
-			if (this.options.functions == null) {
-				this.options.functions = new HashSet<>();
-			}
-			this.options.functions.add(functionName);
-			return this;
-		}
-
-		public Builder proxyToolCalls(Boolean proxyToolCalls) {
-			options.setProxyToolCalls(proxyToolCalls);
+		public Builder httpHeaders(Map<String, String> httpHeaders) {
+			this.options.httpHeaders = httpHeaders;
 			return this;
 		}
 
 		public Builder toolContext(Map<String, Object> toolContext) {
-			options.setToolContext(toolContext);
+			if (this.options.toolContext == null) {
+				this.options.toolContext = toolContext;
+			}
+			else {
+				this.options.toolContext.putAll(toolContext);
+			}
 			return this;
 		}
 
 		public HunYuanChatOptions build() {
-			return options;
+			return this.options;
 		}
 
 	}

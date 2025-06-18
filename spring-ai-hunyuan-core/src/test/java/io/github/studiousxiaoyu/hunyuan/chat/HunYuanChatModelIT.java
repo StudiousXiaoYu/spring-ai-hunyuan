@@ -36,13 +36,13 @@ import org.springframework.ai.chat.model.StreamingChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.ai.content.Media;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.ListOutputConverter;
 import org.springframework.ai.converter.MapOutputConverter;
 import io.github.studiousxiaoyu.hunyuan.HunYuanChatOptions;
 import io.github.studiousxiaoyu.hunyuan.HunYuanTestConfiguration;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
-import org.springframework.ai.model.Media;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -92,7 +92,10 @@ public class HunYuanChatModelIT {
 
 		var imageData = new ClassPathResource("/img.png");
 		media.add(new Media(MediaType.IMAGE_PNG, imageData));
-		UserMessage userMessage = new UserMessage("Which company's logo is in the picture below?", media);
+		UserMessage userMessage = UserMessage.builder()
+			.media(media)
+			.text("Which company's logo is in the picture below?")
+			.build();
 		Prompt prompt = new Prompt(List.of(userMessage),
 				HunYuanChatOptions.builder().model(HunYuanApi.ChatModel.HUNYUAN_TURBO_VISION.getName()).build());
 		ChatResponse response = this.chatModel.call(prompt);
@@ -106,7 +109,10 @@ public class HunYuanChatModelIT {
 
 		var imageData = new ClassPathResource("/img.png");
 		media.add(new Media(MediaType.IMAGE_PNG, imageData));
-		UserMessage userMessage = new UserMessage("Which company's logo is in the picture below?", media);
+		UserMessage userMessage = UserMessage.builder()
+			.media(media)
+			.text("Which company's logo is in the picture below?")
+			.build();
 		Prompt prompt = new Prompt(List.of(userMessage),
 				HunYuanChatOptions.builder().model(HunYuanApi.ChatModel.HUNYUAN_TURBO_VISION.getName()).build());
 		Flux<ChatResponse> response = this.chatModel.stream(prompt);
@@ -123,12 +129,14 @@ public class HunYuanChatModelIT {
 
 	@Test
 	void cloudPictureTest() throws IOException {
-		UserMessage userMessage = new UserMessage("Which company's logo is in the picture below?", List.of(Media
-			.builder()
-			.mimeType(MimeTypeUtils.IMAGE_PNG)
-			.data(new URL(
-					"https://cloudcache.tencent-cloud.com/qcloud/ui/portal-set/build/About/images/bg-product-series_87d.png"))
-			.build()));
+		UserMessage userMessage = UserMessage.builder()
+			.text("Which company's logo is in the picture below?")
+			.media(List.of(Media.builder()
+				.mimeType(MimeTypeUtils.IMAGE_PNG)
+				.data(new URL(
+						"https://cloudcache.tencent-cloud.com/qcloud/ui/portal-set/build/About/images/bg-product-series_87d.png"))
+				.build()))
+			.build();
 		Prompt prompt = new Prompt(List.of(userMessage),
 				HunYuanChatOptions.builder().model(HunYuanApi.ChatModel.HUNYUAN_TURBO_VISION.getName()).build());
 		ChatResponse response = this.chatModel.call(prompt);
@@ -138,12 +146,14 @@ public class HunYuanChatModelIT {
 
 	@Test
 	void cloudPictureStreamTest() throws IOException {
-		UserMessage userMessage = new UserMessage("Which company's logo is in the picture below?", List.of(Media
-			.builder()
-			.mimeType(MimeTypeUtils.IMAGE_PNG)
-			.data(new URL(
-					"https://cloudcache.tencent-cloud.com/qcloud/ui/portal-set/build/About/images/bg-product-series_87d.png"))
-			.build()));
+		UserMessage userMessage = UserMessage.builder()
+			.text("Which company's logo is in the picture below?")
+			.media(List.of(Media.builder()
+				.mimeType(MimeTypeUtils.IMAGE_PNG)
+				.data(new URL(
+						"https://cloudcache.tencent-cloud.com/qcloud/ui/portal-set/build/About/images/bg-product-series_87d.png"))
+				.build()))
+			.build();
 		Prompt prompt = new Prompt(List.of(userMessage),
 				HunYuanChatOptions.builder().model(HunYuanApi.ChatModel.HUNYUAN_TURBO_VISION.getName()).build());
 		Flux<ChatResponse> response = this.chatModel.stream(prompt);
@@ -168,8 +178,10 @@ public class HunYuanChatModelIT {
 				List five {subject}
 				{format}
 				""";
-		PromptTemplate promptTemplate = new PromptTemplate(template,
-				Map.of("subject", "ice cream flavors", "format", format));
+		PromptTemplate promptTemplate = PromptTemplate.builder()
+			.template(template)
+			.variables(Map.of("subject", "ice cream flavors", "format", format))
+			.build();
 		Prompt prompt = new Prompt(promptTemplate.createMessage());
 		Generation generation = this.chatModel.call(prompt).getResult();
 
@@ -189,12 +201,12 @@ public class HunYuanChatModelIT {
 				Provide me a List of {subject}
 				{format}
 				""";
-		PromptTemplate promptTemplate = new PromptTemplate(template, Map.of("subject", """
+		PromptTemplate promptTemplate = PromptTemplate.builder().template(template).variables(Map.of("subject", """
 				numbers from 1 to 9 under they key name 'numbers'.
 				For example here is a list of numbers from 1 to 3 the required format
 					{
 					"numbers": [1, 2, 3]
-					}""", "format", format));
+					}""", "format", format)).build();
 		Prompt prompt = new Prompt(promptTemplate.createMessage());
 		Generation generation = this.chatModel.call(prompt).getResult();
 
@@ -213,7 +225,10 @@ public class HunYuanChatModelIT {
 				Generate the filmography for a random actor.
 				{format}
 				""";
-		PromptTemplate promptTemplate = new PromptTemplate(template, Map.of("format", format));
+		PromptTemplate promptTemplate = PromptTemplate.builder()
+			.template(template)
+			.variables(Map.of("format", format))
+			.build();
 		Prompt prompt = new Prompt(promptTemplate.createMessage());
 		Generation generation = this.chatModel.call(prompt).getResult();
 
@@ -234,7 +249,10 @@ public class HunYuanChatModelIT {
 
 				Your response should be without ```json``` and $schema
 				""";
-		PromptTemplate promptTemplate = new PromptTemplate(template, Map.of("format", format));
+		PromptTemplate promptTemplate = PromptTemplate.builder()
+			.template(template)
+			.variables(Map.of("format", format))
+			.build();
 		Prompt prompt = new Prompt(promptTemplate.createMessage());
 		Generation generation = this.chatModel.call(prompt).getResult();
 
@@ -256,7 +274,10 @@ public class HunYuanChatModelIT {
 
 				your response should be without ```json``` and $shcema.
 				""";
-		PromptTemplate promptTemplate = new PromptTemplate(template, Map.of("format", format));
+		PromptTemplate promptTemplate = PromptTemplate.builder()
+			.template(template)
+			.variables(Map.of("format", format))
+			.build();
 		Prompt prompt = new Prompt(promptTemplate.createMessage());
 
 		String generationTextFromStream = this.streamingChatModel.stream(prompt)

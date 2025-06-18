@@ -18,20 +18,20 @@ package io.github.studiousxiaoyu.hunyuan;
 
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanEmbeddingModel;
 import io.micrometer.observation.ObservationRegistry;
-import org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration;
-import org.springframework.ai.autoconfigure.retry.SpringAiRetryAutoConfiguration;
 import org.springframework.ai.chat.observation.ChatModelObservationConvention;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
 import org.springframework.ai.embedding.observation.EmbeddingModelObservationConvention;
-import org.springframework.ai.model.function.DefaultFunctionCallbackResolver;
-import org.springframework.ai.model.function.FunctionCallback;
-import org.springframework.ai.model.function.FunctionCallbackResolver;
+import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.ai.model.tool.autoconfigure.ToolCallingAutoConfiguration;
+import org.springframework.ai.retry.autoconfigure.SpringAiRetryAutoConfiguration;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -49,20 +49,21 @@ import java.util.List;
  *
  * @author Guo Junyu
  */
-@AutoConfiguration(after = { RestClientAutoConfiguration.class, SpringAiRetryAutoConfiguration.class })
-@EnableConfigurationProperties({ HunYuanCommonProperties.class, HunYuanChatProperties.class, HunYuanEmbeddingProperties.class })
+@AutoConfiguration(after = { RestClientAutoConfiguration.class, WebClientAutoConfiguration.class,
+		SpringAiRetryAutoConfiguration.class, ToolCallingAutoConfiguration.class })
+@EnableConfigurationProperties({ HunYuanCommonProperties.class, HunYuanChatProperties.class,
+		HunYuanEmbeddingProperties.class })
 @ConditionalOnClass(HunYuanApi.class)
+@ImportAutoConfiguration(classes = { SpringAiRetryAutoConfiguration.class, RestClientAutoConfiguration.class,
+		WebClientAutoConfiguration.class, ToolCallingAutoConfiguration.class })
 public class HunYuanAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(prefix = HunYuanChatProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
-			matchIfMissing = true)
 	public HunYuanChatModel hunyuanChatModel(HunYuanCommonProperties commonProperties,
 			HunYuanChatProperties chatProperties, ObjectProvider<RestClient.Builder> restClientBuilderProvider,
-			List<FunctionCallback> toolFunctionCallbacks, FunctionCallbackResolver functionCallbackResolver,
-			RetryTemplate retryTemplate, ResponseErrorHandler responseErrorHandler,
-			ObjectProvider<ObservationRegistry> observationRegistry,
+			ToolCallingManager toolCallingManager, RetryTemplate retryTemplate,
+			ResponseErrorHandler responseErrorHandler, ObjectProvider<ObservationRegistry> observationRegistry,
 			ObjectProvider<ChatModelObservationConvention> observationConvention) {
 
 		var hunyuanApi = hunyuanApi(chatProperties.getSecretId(), commonProperties.getSecretId(),
@@ -70,8 +71,8 @@ public class HunYuanAutoConfiguration {
 				commonProperties.getBaseUrl(), restClientBuilderProvider.getIfAvailable(RestClient::builder),
 				responseErrorHandler);
 
-		var chatModel = new HunYuanChatModel(hunyuanApi, chatProperties.getOptions(), functionCallbackResolver,
-				toolFunctionCallbacks, retryTemplate, observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP));
+		var chatModel = new HunYuanChatModel(hunyuanApi, chatProperties.getOptions(), toolCallingManager, retryTemplate,
+				observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP));
 
 		observationConvention.ifAvailable(chatModel::setObservationConvention);
 		return chatModel;
@@ -79,29 +80,20 @@ public class HunYuanAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public FunctionCallbackResolver springAiFunctionManager(ApplicationContext context) {
-		DefaultFunctionCallbackResolver manager = new DefaultFunctionCallbackResolver();
-		manager.setApplicationContext(context);
-		return manager;
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
-	@ConditionalOnProperty(prefix = HunYuanEmbeddingProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
-			matchIfMissing = true)
 	public HunYuanEmbeddingModel hunYuanEmbeddingModel(HunYuanCommonProperties commonProperties,
-													  HunYuanEmbeddingProperties embeddingProperties, ObjectProvider<RestClient.Builder> restClientBuilderProvider,
-													  ObjectProvider<WebClient.Builder> webClientBuilderProvider, RetryTemplate retryTemplate,
-													  ResponseErrorHandler responseErrorHandler, ObjectProvider<ObservationRegistry> observationRegistry,
-													  ObjectProvider<EmbeddingModelObservationConvention> observationConvention) {
+			HunYuanEmbeddingProperties embeddingProperties,
+			ObjectProvider<RestClient.Builder> restClientBuilderProvider,
+			ObjectProvider<WebClient.Builder> webClientBuilderProvider, RetryTemplate retryTemplate,
+			ResponseErrorHandler responseErrorHandler, ObjectProvider<ObservationRegistry> observationRegistry,
+			ObjectProvider<EmbeddingModelObservationConvention> observationConvention) {
 
 		var hunyuanApi = hunyuanApi(embeddingProperties.getSecretId(), commonProperties.getSecretId(),
 				embeddingProperties.getSecretKey(), commonProperties.getSecretKey(), embeddingProperties.getBaseUrl(),
-				commonProperties.getBaseUrl(),
-				restClientBuilderProvider.getIfAvailable(RestClient::builder),responseErrorHandler);
+				commonProperties.getBaseUrl(), restClientBuilderProvider.getIfAvailable(RestClient::builder),
+				responseErrorHandler);
 
-		var embeddingModel = new HunYuanEmbeddingModel(embeddingProperties.getOptions(), retryTemplate,hunyuanApi, embeddingProperties.getMetadataMode(),
-				observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP));
+		var embeddingModel = new HunYuanEmbeddingModel(embeddingProperties.getOptions(), retryTemplate, hunyuanApi,
+				embeddingProperties.getMetadataMode(), observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP));
 
 		observationConvention.ifAvailable(embeddingModel::setObservationConvention);
 

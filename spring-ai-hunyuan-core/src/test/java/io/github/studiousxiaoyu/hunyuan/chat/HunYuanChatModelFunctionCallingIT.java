@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.tool.function.FunctionToolCallback;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -34,7 +35,6 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.model.function.FunctionCallback;
 import io.github.studiousxiaoyu.hunyuan.HunYuanChatOptions;
 import io.github.studiousxiaoyu.hunyuan.HunYuanTestConfiguration;
 import io.github.studiousxiaoyu.hunyuan.api.MockWeatherService;
@@ -67,8 +67,7 @@ class HunYuanChatModelFunctionCallingIT {
 
 		var promptOptions = HunYuanChatOptions.builder()
 			.model(HunYuanApi.ChatModel.HUNYUAN_PRO.getValue())
-			.functionCallbacks(List.of(FunctionCallback.builder()
-				.function("getCurrentWeather", new MockWeatherService())
+			.toolCallbacks(List.of(FunctionToolCallback.builder("getCurrentWeather", new MockWeatherService())
 				.description("Get the weather in location")
 				.inputType(MockWeatherService.Request.class)
 				.build()))
@@ -90,8 +89,7 @@ class HunYuanChatModelFunctionCallingIT {
 		List<Message> messages = new ArrayList<>(List.of(userMessage));
 
 		var promptOptions = HunYuanChatOptions.builder()
-			.functionCallbacks(List.of(FunctionCallback.builder()
-				.function("getCurrentWeather", new MockWeatherService())
+			.toolCallbacks(List.of(FunctionToolCallback.builder("getCurrentWeather", new MockWeatherService())
 				.description("Get the weather in location")
 				.inputType(MockWeatherService.Request.class)
 				.build()))

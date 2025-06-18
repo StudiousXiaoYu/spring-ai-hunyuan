@@ -25,13 +25,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanConstants;
+import org.springframework.ai.model.tool.ToolCallingManager;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.metadata.ChatResponseMetadata;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.observation.DefaultChatModelObservationConvention;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.model.function.DefaultFunctionCallbackResolver;
 import io.github.studiousxiaoyu.hunyuan.HunYuanChatModel;
 import io.github.studiousxiaoyu.hunyuan.HunYuanChatOptions;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
@@ -141,7 +141,7 @@ public class HunYuanChatModelObservationIT {
 			.hasHighCardinalityKeyValue(HighCardinalityKeyNames.USAGE_INPUT_TOKENS.asString(),
 					String.valueOf(responseMetadata.getUsage().getPromptTokens()))
 			.hasHighCardinalityKeyValue(HighCardinalityKeyNames.USAGE_OUTPUT_TOKENS.asString(),
-					String.valueOf(responseMetadata.getUsage().getGenerationTokens()))
+					String.valueOf(responseMetadata.getUsage().getCompletionTokens()))
 			.hasHighCardinalityKeyValue(HighCardinalityKeyNames.USAGE_TOTAL_TOKENS.asString(),
 					String.valueOf(responseMetadata.getUsage().getTotalTokens()))
 			.hasBeenStarted()
@@ -164,8 +164,7 @@ public class HunYuanChatModelObservationIT {
 		@Bean
 		public HunYuanChatModel hunYuanChatModel(HunYuanApi hunYuanApi, TestObservationRegistry observationRegistry) {
 			return new HunYuanChatModel(hunYuanApi, HunYuanChatOptions.builder().build(),
-					new DefaultFunctionCallbackResolver(), List.of(), RetryTemplate.defaultInstance(),
-					observationRegistry);
+					ToolCallingManager.builder().build(), RetryTemplate.defaultInstance(), observationRegistry);
 		}
 
 	}

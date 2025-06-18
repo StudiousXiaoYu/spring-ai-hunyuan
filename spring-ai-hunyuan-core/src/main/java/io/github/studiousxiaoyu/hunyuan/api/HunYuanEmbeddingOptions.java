@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package io.github.studiousxiaoyu.hunyuan.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -65,7 +64,6 @@ public class HunYuanEmbeddingOptions implements EmbeddingOptions {
 		this.dimensions = dimensions;
 	}
 
-
 	public static class Builder {
 
 		protected HunYuanEmbeddingOptions options;
@@ -83,6 +81,7 @@ public class HunYuanEmbeddingOptions implements EmbeddingOptions {
 			this.options.dimensions = dimensions;
 			return this;
 		}
+
 		public HunYuanEmbeddingOptions build() {
 			return this.options;
 		}

@@ -66,13 +66,15 @@ public class HunYuanRetryTests {
 		this.retryListener = new TestRetryListener();
 		retryTemplate.registerListener(this.retryListener);
 
-		this.chatModel = new HunYuanChatModel(this.hunYuanApi,
-				HunYuanChatOptions.builder()
-					.temperature(0.7)
-					.topP(1.0)
-					.model(HunYuanApi.ChatModel.HUNYUAN_PRO.getValue())
-					.build(),
-				null, retryTemplate);
+		this.chatModel = HunYuanChatModel.builder()
+			.defaultOptions(HunYuanChatOptions.builder()
+				.temperature(0.7)
+				.topP(1.0)
+				.model(HunYuanApi.ChatModel.HUNYUAN_PRO.getValue())
+				.build())
+			.hunYuanApi(this.hunYuanApi)
+			.retryTemplate(retryTemplate)
+			.build();
 	}
 
 	@Test
