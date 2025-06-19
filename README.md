@@ -5,7 +5,7 @@
 本项目是基于 **Spring AI** 集成 **腾讯云 HunYuan 大模型 API** 的 Java SDK，提供了对 HunYuan Pro、Embedding 模型的封装调用支持，并通过自动配置简化集成过程。
 
 
-当前以支持功能：
+当前已支持功能：
 - ✅ Chat ( 流式回答、图片理解 )
 - ✅ Embedding
 
@@ -58,17 +58,13 @@ spring.ai.hunyuan.embedding.options.dimensions=1024
 #### 使用 `ChatClient` 发起对话
 
 ```java
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 @Service
 public class HunYuanService {
 
     private final ChatClient chatClient;
 
-    public HunYuanService(ChatClient chatClient) {
-        this.chatClient = chatClient;
+    public HunYuanService(ChatModel chatModel) {
+        this.chatClient = ChatClient.builder(chatModel).build();
     }
 
     public String askQuestion(String question) {
