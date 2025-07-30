@@ -47,11 +47,13 @@ jobs:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
-      # 添加 Maven Central 服务器配置
       - name: Create settings.xml
         run: |
           cat << EOF > $GITHUB_WORKSPACE/settings.xml
-          <settings>
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                                        https://maven.apache.org/xsd/settings-1.0.0.xsd">
             <servers>
               <!-- GitHub Packages 配置 -->
               <server>
@@ -75,6 +77,10 @@ jobs:
 
       - name: Build and Publish
         run: |
+          # 添加调试信息
+          echo "Using Maven Central username: $MAVEN_CENTRAL_USERNAME"
+          echo "Using server ID: my-public-project"
+          
           mvn -B deploy \
             -s $GITHUB_WORKSPACE/settings.xml \
             -Dgpg.keyname=$KEY_ID \
