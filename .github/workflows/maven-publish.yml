@@ -65,8 +65,8 @@ jobs:
               <!-- Maven Central 配置 -->
               <server>
                 <id>my-public-project</id>
-                <username>\${env.MAVEN_REPO_USERNAME}</username>
-                <password>\${env.MAVEN_REPO_PASSWORD}</password>
+                <username>\${secrets.MAVEN_REPO_USERNAME}</username>
+                <password>\${secrets.MAVEN_REPO_PASSWORD}</password>
               </server>
             </servers>
           </settings>
@@ -78,7 +78,7 @@ jobs:
       - name: Build and Publish
         run: |
           # 添加调试信息
-          echo "Using Maven Central username: $MAVEN_REPO_USERNAME"
+          echo "Using Maven Central username: ${{ secrets.MAVEN_REPO_USERNAME }}"
           echo "Using server ID: my-public-project"
           
           mvn -B deploy \
