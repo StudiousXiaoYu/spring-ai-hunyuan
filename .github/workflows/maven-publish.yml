@@ -11,27 +11,32 @@ on:
         default: 'default value'
 
 jobs:
-  publish:
+  build:
+    name: Release project
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+
+      - name: Check out sources
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
-          java-version: '17'
           distribution: 'temurin'
-          settings-path: ${{ github.workspace }}
-          server-id: my-public-project
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-      - id: install-secret-key
-        name: Install gpg secret key
+          java-version: 17
+          cache: 'maven'
+
+      - name: Install GPG key
         run: |
-          cat <(echo -e "${{ secrets.GPG_PRIVATE_KEY }}") | gpg --batch --import
-          gpg --list-secret-keys --keyid-format LONG
-      - name: Publish package
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" > gpg.asc
+          echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 --import gpg.asc
+
+      - name: Release to Sonatype OSSRH
         env:
-          MAVEN_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.MAVEN_REPO_PASSWORD }}
-        run: mvn --batch-mode -Dgpg.passphrase=${{ secrets.GPG_PASSPHRASE }} clean deploy
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.MAVEN_REPO_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.MAVEN_REPO_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          ./mvnw -B clean install -DskipTests
+          ./mvnw -B clean deploy -Psonatype -s settings.xml
