@@ -6,7 +6,7 @@
 
     <groupId>io.github.studiousxiaoyu</groupId>
     <artifactId>spring-ai-hunyuan</artifactId>
-    <version>1.0.0.1</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
     <modules>
         <module>spring-ai-hunyuan-core</module>
@@ -42,12 +42,49 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <revision>1.0.0.1</revision>
+        <revision>1.0.0</revision>
         <spring-boot.version>3.3.3</spring-boot.version>
         <!-- Spring AI -->
         <spring-ai.version>1.0.0</spring-ai.version>
         <xml.bind.version>2.3.0</xml.bind.version>
     </properties>
+<profiles>
+    <profile>
+        <id>sonatype</id>
+        <properties>
+            <maven.test.skip>true</maven.test.skip>
+        </properties>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <!-- Passphrase consumed from MAVEN_GPG_PASSPHRASE environment variable. -->
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <publishingServerId>central</publishingServerId>
+                        <autoPublish>true</autoPublish>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+</profiles>
 <dependencyManagement>
     <dependencies>
         <dependency>
