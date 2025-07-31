@@ -99,7 +99,7 @@
                 <version>0.7.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <publishingServerId>my-public-project</publishingServerId>
+                    <publishingServerId>central</publishingServerId>
                     <!--                    <autoPublish>true</autoPublish>-->
                 </configuration>
             </plugin>
