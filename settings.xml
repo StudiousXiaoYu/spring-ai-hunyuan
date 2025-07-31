@@ -3,15 +3,11 @@
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
                       https://maven.apache.org/xsd/settings-1.0.0.xsd">
 
-    <servers>
-        <server>
-            <id>gpg.passphrase</id>
-            <passphrase>${env.GPG_PASSPHRASE}</passphrase>
-        </server>
-        <server>
-            <id>my-public-project</id>
-            <username>${env.MAVEN_REPO_USERNAME}</username>
-            <password>${env.MAVEN_REPO_PASSWORD}</password>
-        </server>
-    </servers>
+<servers>
+      <server>
+        <id>central</id>
+        <username>${env.CENTRAL_TOKEN_USERNAME}</username>
+        <password>${env.CENTRAL_TOKEN_PASSWORD}</password>
+      </server>
+</servers>
 </settings>
