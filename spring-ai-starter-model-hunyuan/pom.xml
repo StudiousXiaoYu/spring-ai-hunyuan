@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.studiousxiaoyu</groupId>
         <artifactId>spring-ai-hunyuan</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.0.1</version>
     </parent>
 
     <artifactId>spring-ai-starter-model-hunyuan</artifactId>
@@ -33,13 +33,13 @@
         <dependency>
             <groupId>io.github.studiousxiaoyu</groupId>
             <artifactId>spring-ai-autoconfigure-model-hunyuan</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.0.1</version>
         </dependency>
 
         <dependency>
             <groupId>io.github.studiousxiaoyu</groupId>
             <artifactId>spring-ai-hunyuan-core</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.0.1</version>
         </dependency>
     </dependencies>
 
