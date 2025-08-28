@@ -67,9 +67,13 @@ public class HunYuanChatOptions implements ToolCallingChatOptions {
 
 	private @JsonProperty("EnableDeepSearch") Boolean enableDeepSearch;
 
-	private @JsonProperty("ForceSearchEnhancement") Boolean ForceSearchEnhancement;
+	private @JsonProperty("forceSearchEnhancement") Boolean forceSearchEnhancement;
 
 	private @JsonProperty("EnableRecommendedQuestions") Boolean enableRecommendedQuestions;
+
+	private @JsonProperty("EnableDeepRead") Boolean enableDeepRead;
+
+	private @JsonProperty("EnableThinking") Boolean enableThinking;
 
 	/**
 	 * HunYuan Tool Function Callbacks to register with the ChatModel. For Prompt Options
@@ -262,11 +266,11 @@ public class HunYuanChatOptions implements ToolCallingChatOptions {
 	}
 
 	public Boolean getForceSearchEnhancement() {
-		return ForceSearchEnhancement;
+		return forceSearchEnhancement;
 	}
 
 	public void setForceSearchEnhancement(Boolean forceSearchEnhancement) {
-		ForceSearchEnhancement = forceSearchEnhancement;
+		forceSearchEnhancement = forceSearchEnhancement;
 	}
 
 	public Boolean getEnableRecommendedQuestions() {
@@ -275,6 +279,22 @@ public class HunYuanChatOptions implements ToolCallingChatOptions {
 
 	public void setEnableRecommendedQuestions(Boolean enableRecommendedQuestions) {
 		this.enableRecommendedQuestions = enableRecommendedQuestions;
+	}
+
+	public Boolean getEnableThinking() {
+		return enableThinking;
+	}
+
+	public void setEnableThinking(Boolean enableThinking) {
+		enableThinking = enableThinking;
+	}
+
+	public Boolean getEnableDeepRead() {
+		return enableDeepRead;
+	}
+
+	public void setEnableDeepRead(Boolean enableDeepRead) {
+		this.enableDeepRead = enableDeepRead;
 	}
 
 	@Override
@@ -356,10 +376,12 @@ public class HunYuanChatOptions implements ToolCallingChatOptions {
 				&& Objects.equals(citation, that.citation) && Objects.equals(enableSpeedSearch, that.enableSpeedSearch)
 				&& Objects.equals(enableMultimedia, that.enableMultimedia)
 				&& Objects.equals(enableDeepSearch, that.enableDeepSearch)
-				&& Objects.equals(ForceSearchEnhancement, that.ForceSearchEnhancement)
+				&& Objects.equals(forceSearchEnhancement, that.forceSearchEnhancement)
 				&& Objects.equals(enableRecommendedQuestions, that.enableRecommendedQuestions)
 				&& Objects.equals(toolCallbacks, that.toolCallbacks) && Objects.equals(toolNames, that.toolNames)
 				&& Objects.equals(internalToolExecutionEnabled, that.internalToolExecutionEnabled)
+				&& Objects.equals(enableThinking, that.enableThinking)
+				&& Objects.equals(enableDeepRead, that.enableDeepRead)
 				&& Objects.equals(httpHeaders, that.httpHeaders) && Objects.equals(toolContext, that.toolContext);
 	}
 
@@ -380,13 +402,15 @@ public class HunYuanChatOptions implements ToolCallingChatOptions {
 		result = 31 * result + Objects.hashCode(enableSpeedSearch);
 		result = 31 * result + Objects.hashCode(enableMultimedia);
 		result = 31 * result + Objects.hashCode(enableDeepSearch);
-		result = 31 * result + Objects.hashCode(ForceSearchEnhancement);
+		result = 31 * result + Objects.hashCode(forceSearchEnhancement);
 		result = 31 * result + Objects.hashCode(enableRecommendedQuestions);
 		result = 31 * result + Objects.hashCode(toolCallbacks);
 		result = 31 * result + Objects.hashCode(toolNames);
 		result = 31 * result + Objects.hashCode(internalToolExecutionEnabled);
 		result = 31 * result + Objects.hashCode(httpHeaders);
 		result = 31 * result + Objects.hashCode(toolContext);
+		result = 31 * result + Objects.hashCode(enableThinking);
+		result = 31 * result + Objects.hashCode(enableDeepRead);
 		return result;
 	}
 
