@@ -17,14 +17,14 @@
 package io.github.studiousxiaoyu.hunyuan;
 
 import io.github.studiousxiaoyu.hunyuan.api.MockWeatherService;
+import io.github.studiousxiaoyu.hunyuan.chat.HunYuanChatModel;
+import io.github.studiousxiaoyu.hunyuan.chat.HunYuanChatOptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import org.springframework.ai.chat.prompt.Prompt;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.DefaultToolDefinition;
 import org.springframework.ai.tool.definition.ToolDefinition;

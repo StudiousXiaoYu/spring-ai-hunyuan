@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.studiousxiaoyu.hunyuan;
+package io.github.studiousxiaoyu.hunyuan.chat;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;

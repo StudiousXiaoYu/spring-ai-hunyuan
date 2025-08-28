@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.studiousxiaoyu.hunyuan;
+package io.github.studiousxiaoyu.hunyuan.chat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

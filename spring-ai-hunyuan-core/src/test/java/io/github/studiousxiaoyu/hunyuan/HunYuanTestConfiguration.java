@@ -18,6 +18,7 @@ package io.github.studiousxiaoyu.hunyuan;
 
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanEmbeddingModel;
+import io.github.studiousxiaoyu.hunyuan.chat.HunYuanChatModel;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.StringUtils;

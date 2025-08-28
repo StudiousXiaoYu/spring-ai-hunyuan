@@ -17,6 +17,7 @@
 package io.github.studiousxiaoyu.hunyuan;
 
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanEmbeddingModel;
+import io.github.studiousxiaoyu.hunyuan.chat.HunYuanChatModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;

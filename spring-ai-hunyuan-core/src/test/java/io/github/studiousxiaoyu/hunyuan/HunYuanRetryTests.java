@@ -19,6 +19,8 @@ package io.github.studiousxiaoyu.hunyuan;
 import java.util.List;
 import java.util.Optional;
 
+import io.github.studiousxiaoyu.hunyuan.chat.HunYuanChatModel;
+import io.github.studiousxiaoyu.hunyuan.chat.HunYuanChatOptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

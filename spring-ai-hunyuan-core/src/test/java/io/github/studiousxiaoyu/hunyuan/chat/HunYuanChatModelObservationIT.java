@@ -32,8 +32,6 @@ import org.springframework.ai.chat.metadata.ChatResponseMetadata;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.observation.DefaultChatModelObservationConvention;
 import org.springframework.ai.chat.prompt.Prompt;
-import io.github.studiousxiaoyu.hunyuan.HunYuanChatModel;
-import io.github.studiousxiaoyu.hunyuan.HunYuanChatOptions;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
 import org.springframework.ai.observation.conventions.AiOperationType;
 import org.springframework.beans.factory.annotation.Autowired;

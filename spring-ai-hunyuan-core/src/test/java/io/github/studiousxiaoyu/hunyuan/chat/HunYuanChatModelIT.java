@@ -40,7 +40,6 @@ import org.springframework.ai.content.Media;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.ListOutputConverter;
 import org.springframework.ai.converter.MapOutputConverter;
-import io.github.studiousxiaoyu.hunyuan.HunYuanChatOptions;
 import io.github.studiousxiaoyu.hunyuan.HunYuanTestConfiguration;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
 import org.springframework.beans.factory.annotation.Autowired;
