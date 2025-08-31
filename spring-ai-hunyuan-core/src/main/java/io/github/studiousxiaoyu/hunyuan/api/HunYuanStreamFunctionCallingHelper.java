@@ -49,7 +49,8 @@ public class HunYuanStreamFunctionCallingHelper {
 		Usage usage = (current.usage() != null ? current.usage() : previous.usage());
 		ChatCompletion.Choice choice = mergeChoice(previousChoice, currentChoice);
 		List<ChatCompletion.Choice> chunkChoices = choice == null ? List.of() : List.of(choice);
-		return new ChatCompletionChunk(id, null, created, note, chunkChoices, usage, null, null, null, null, null);
+		return new ChatCompletionChunk(id, null, created, note, chunkChoices, usage, null, null, null, null, null,
+				null);
 	}
 
 	private ChatCompletion.Choice mergeChoice(ChatCompletion.Choice previous, ChatCompletion.Choice current) {

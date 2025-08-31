@@ -61,10 +61,10 @@ public class HunYuanAutoConfiguration {
 	@ConditionalOnProperty(prefix = HunYuanChatProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
 			matchIfMissing = true)
 	public HunYuanChatModel hunyuanChatModel(HunYuanCommonProperties commonProperties,
-                                             HunYuanChatProperties chatProperties, ObjectProvider<RestClient.Builder> restClientBuilderProvider,
-                                             ToolCallingManager toolCallingManager, RetryTemplate retryTemplate,
-                                             ResponseErrorHandler responseErrorHandler, ObjectProvider<ObservationRegistry> observationRegistry,
-                                             ObjectProvider<ChatModelObservationConvention> observationConvention) {
+			HunYuanChatProperties chatProperties, ObjectProvider<RestClient.Builder> restClientBuilderProvider,
+			ToolCallingManager toolCallingManager, RetryTemplate retryTemplate,
+			ResponseErrorHandler responseErrorHandler, ObjectProvider<ObservationRegistry> observationRegistry,
+			ObjectProvider<ChatModelObservationConvention> observationConvention) {
 
 		var hunyuanApi = hunyuanApi(chatProperties.getSecretId(), commonProperties.getSecretId(),
 				chatProperties.getSecretKey(), commonProperties.getSecretKey(), chatProperties.getBaseUrl(),

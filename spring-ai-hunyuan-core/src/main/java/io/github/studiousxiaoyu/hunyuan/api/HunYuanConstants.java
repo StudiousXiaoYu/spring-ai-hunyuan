@@ -41,14 +41,16 @@ public final class HunYuanConstants {
 
 	public static final String CT_JSON = "application/json; charset=utf-8";
 
-	//1：等待中、2：运行中、4：处理失败、5：处理完成。
+	// 1：等待中、2：运行中、4：处理失败、5：处理完成。
 	public static final String STATUS_WAITING = "1";
+
 	public static final String STATUS_RUNNING = "2";
+
 	public static final String STATUS_FAILED = "4";
+
 	public static final String STATUS_SUCCESS = "5";
 
 	public static final String IMAGE_RUNNING_MESSAGE = "正在生成中，请稍等...";
-
 
 	private HunYuanConstants() {
 

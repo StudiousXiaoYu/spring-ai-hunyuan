@@ -381,8 +381,8 @@ public class HunYuanChatOptions implements ToolCallingChatOptions {
 				&& Objects.equals(toolCallbacks, that.toolCallbacks) && Objects.equals(toolNames, that.toolNames)
 				&& Objects.equals(internalToolExecutionEnabled, that.internalToolExecutionEnabled)
 				&& Objects.equals(enableThinking, that.enableThinking)
-				&& Objects.equals(enableDeepRead, that.enableDeepRead)
-				&& Objects.equals(httpHeaders, that.httpHeaders) && Objects.equals(toolContext, that.toolContext);
+				&& Objects.equals(enableDeepRead, that.enableDeepRead) && Objects.equals(httpHeaders, that.httpHeaders)
+				&& Objects.equals(toolContext, that.toolContext);
 	}
 
 	@Override

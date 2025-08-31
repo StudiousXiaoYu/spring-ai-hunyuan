@@ -16,6 +16,7 @@
 
 package io.github.studiousxiaoyu.hunyuan.chat;
 
+import io.github.studiousxiaoyu.hunyuan.chat.message.HunYuanAssistantMessage;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
@@ -145,14 +146,16 @@ public class HunYuanChatModel implements ChatModel {
 					.map(toolCall -> new AssistantMessage.ToolCall(toolCall.id(), "function",
 							toolCall.function().name(), toolCall.function().arguments()))
 					.toList();
+		String reasoningContent = choice.message().reasoningContent();
+		String textContent = choice.message().content();
 
-		var assistantMessage = new AssistantMessage(choice.message().content(), metadata, toolCalls);
+		var assistantMessage = new HunYuanAssistantMessage(textContent, reasoningContent, metadata, toolCalls);
 		String finishReason = (choice.finishReason() != null ? choice.finishReason() : "");
 		var generationMetadata = ChatGenerationMetadata.builder().finishReason(finishReason).build();
 		return new Generation(assistantMessage, generationMetadata);
 	}
 
-	Prompt buildRequestPrompt(Prompt prompt) {
+	public Prompt buildRequestPrompt(Prompt prompt) {
 		// Process runtime options
 		HunYuanChatOptions runtimeOptions = null;
 		if (prompt.getOptions() != null) {
@@ -419,7 +422,7 @@ public class HunYuanChatModel implements ChatModel {
 
 		return new ChatCompletion(chunk.id(), chunk.errorMsg(), chunk.created(), chunk.note(), choices, chunk.usage(),
 				chunk.moderationLevel(), chunk.searchInfo(), chunk.replaces(), chunk.recommendedQuestions(),
-				chunk.requestId());
+				chunk.processes(), chunk.requestId());
 	}
 
 	/**
@@ -461,7 +464,7 @@ public class HunYuanChatModel implements ChatModel {
 					}).toList();
 				}
 				return List.of(new ChatCompletionMessage(assistantMessage.getText(),
-						ChatCompletionMessage.Role.assistant, null, null, toolCalls));
+						ChatCompletionMessage.Role.assistant, null, null, toolCalls, null, null));
 			}
 			else if (message.getMessageType() == MessageType.TOOL) {
 				ToolResponseMessage toolMessage = (ToolResponseMessage) message;
@@ -472,7 +475,7 @@ public class HunYuanChatModel implements ChatModel {
 				return toolMessage.getResponses()
 					.stream()
 					.map(tr -> new ChatCompletionMessage(tr.responseData(), ChatCompletionMessage.Role.tool, null,
-							tr.id(), null))
+							tr.id(), null, null, null))
 					.toList();
 			}
 			else {

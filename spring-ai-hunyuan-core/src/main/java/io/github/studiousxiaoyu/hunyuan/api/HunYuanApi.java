@@ -219,7 +219,7 @@ public class HunYuanApi {
 			// Flux<Flux<ChatCompletionChunk>> -> Flux<Mono<ChatCompletionChunk>>
 			.concatMapIterable(window -> {
 				Mono<ChatCompletionChunk> monoChunk = window.reduce(
-						new ChatCompletionChunk(null, null, null, null, null, null, null, null, null, null, null),
+						new ChatCompletionChunk(null, null, null, null, null, null, null, null, null, null, null, null),
 						(previous, current) -> this.chunkMerger.merge(previous, current));
 				return List.of(monoChunk);
 			})
@@ -318,7 +318,13 @@ public class HunYuanApi {
 		HUNYUAN_LARGE("hunyuan-large"),
 		HUNYUAN_LARGE_LONGCONTEXT("hunyuan-large-longcontext"),
 		HUNYUAN_TURBO_VISION("hunyuan-turbo-vision"),
+		HUNYUAN_T1_LATEST("hunyuan-t1-latest"),
+		HUNYUAN_A13B("hunyuan-a13b"),
+		HUNYUAN_TRANSLATION("hunyuan-translation"),
 		HUNYUAN_STANDARD_VISION("hunyuan-standard-vision");
+
+
+
 		 // @formatter:on
 
 		private final String value;
@@ -595,7 +601,9 @@ public class HunYuanApi {
 		@JsonProperty("Role") Role role,
 		@JsonProperty("Contents") List<ChatContent> chatContents,
 		@JsonProperty("ToolCallId") String toolCallId,
-		@JsonProperty("ToolCalls") List<ToolCall> toolCalls
+		@JsonProperty("ToolCalls") List<ToolCall> toolCalls,
+		@JsonProperty("FileIDs") List<String> fileIDs,
+		@JsonProperty("ReasoningContent") String reasoningContent
 	// @formatter:on
 	) {
 
@@ -606,15 +614,20 @@ public class HunYuanApi {
 		 * @param role The role of the author of this message.
 		 */
 		public ChatCompletionMessage(Object content, Role role) {
-			this(content, role, null, null, null);
+			this(content, role, null, null, null, null, null);
 		}
 
 		public ChatCompletionMessage(Object content, Role role, List<ToolCall> toolCalls) {
-			this(content, role, null, null, toolCalls);
+			this(content, role, null, null, toolCalls, null, null);
 		}
 
 		public ChatCompletionMessage(Role role, List<ChatContent> chatContent) {
-			this(null, role, chatContent, null, null);
+			this(null, role, chatContent, null, null, null, null);
+		}
+
+		public ChatCompletionMessage(Object rawContent, Role role, List<ChatContent> chatContent, String toolCallId,
+				List<ToolCall> toolCalls) {
+			this(rawContent, role, chatContent, toolCallId, toolCalls, null, null);
 		}
 
 		/**
@@ -743,15 +756,23 @@ public class HunYuanApi {
 	@JsonProperty("SearchInfo") SearchInfo searchInfo,
 	@JsonProperty("Replaces") List<Replace>  replaces,
 	@JsonProperty("RecommendedQuestions") List<String> recommendedQuestions,
+	@JsonProperty("Processes") List<Processes> processes,
 	@JsonProperty("RequestId") String requestId
 	) {
 
-
-
+		@JsonInclude(Include.NON_NULL)
+		public record Processes(
+				// @formatter:off
+				@JsonProperty("Message") String message,
+				@JsonProperty("State") String state,
+				@JsonProperty("Num") Integer num
+		) {
+			// @formatter:on
+		}
 
 		@JsonInclude(Include.NON_NULL)
 		public record Replace(
-				// @formatter:off
+		// @formatter:off
 				@JsonProperty("Id") String id,
 				@JsonProperty("Multimedia") List<Multimedia> multimedias
 		) {
@@ -911,6 +932,7 @@ public class HunYuanApi {
 	@JsonProperty("SearchInfo") ChatCompletion.SearchInfo searchInfo,
 	@JsonProperty("Replaces") List<ChatCompletion.Replace>  replaces,
 	@JsonProperty("RecommendedQuestions") List<String> recommendedQuestions,
+	@JsonProperty("Processes") List<ChatCompletion.Processes> processes,
 	@JsonProperty("RequestId") String requestId) {
 	}
 
