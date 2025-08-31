@@ -89,6 +89,36 @@ public class HunYuanChatModelThinkIT {
 	}
 
 	@Test
+	void thinkingStreamTest() {
+		SystemPromptTemplate systemPromptTemplate = new SystemPromptTemplate(this.systemResource);
+		Message systemMessage = systemPromptTemplate.createMessage(Map.of("name", "Bob", "voice", "pirate"));
+		UserMessage userMessage = new UserMessage(
+				"Tell me about 3 famous pirates from the Golden Age of Piracy and why they did.");
+		Prompt prompt = new Prompt(List.of(userMessage, systemMessage),
+				HunYuanChatOptions.builder().model(HunYuanApi.ChatModel.HUNYUAN_A13B.getName()).build());
+		String generationTextFromStream = this.streamingChatModel.stream(prompt)
+				.collectList()
+				.block()
+				.stream()
+				.map(ChatResponse::getResults)
+				.flatMap(List::stream)
+				.map(Generation::getOutput)
+				.map(message -> {
+					if (message instanceof HunYuanAssistantMessage) {
+						HunYuanAssistantMessage hunYuanMessage = (HunYuanAssistantMessage) message;
+						// 可以选择返回包含思考链和文本的对象，或者只返回需要的部分
+						return "think: " + hunYuanMessage.getReasoningContent() +
+								"/think " + hunYuanMessage.getText();
+					}
+					return message.getText();
+				})
+				.collect(Collectors.joining());
+		logger.info("Response: {}", generationTextFromStream);
+		assertThat(generationTextFromStream).isNotNull();
+		assertThat(generationTextFromStream).contains("Blackbeard");
+	}
+
+	@Test
 	void thinkingStructTest() {
 		DefaultConversionService conversionService = new DefaultConversionService();
 		ListOutputConverter outputConverter = new ListOutputConverter(conversionService);
@@ -107,7 +137,7 @@ public class HunYuanChatModelThinkIT {
 		Generation generation = this.chatModel.call(prompt).getResult();
 		List<String> list = outputConverter.convert(generation.getOutput().getText());
 		assertThat(((HunYuanAssistantMessage) generation.getOutput()).getReasoningContent()).isNotNull();
-		logger.info("list" + ModelOptionsUtils.toJsonString(list));
+		logger.info("getReasoningContent:" + ((HunYuanAssistantMessage) generation.getOutput()).getReasoningContent());
 		assertThat(list).hasSize(5);
 	}
 

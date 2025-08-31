@@ -60,15 +60,18 @@ public class HunYuanStreamFunctionCallingHelper {
 
 		String finishReason = (current.finishReason() != null ? current.finishReason() : previous.finishReason());
 		Integer index = (current.index() != null ? current.index() : previous.index());
+		String moderationLevel = (current.moderationLevel() != null ? current.moderationLevel() : previous.moderationLevel());
 
 		ChatCompletion.ChatCompletionDelta delta = merge(previous.delta(), current.delta());
-		return new ChatCompletion.Choice(index, null, finishReason, delta);
+		return new ChatCompletion.Choice(index, null, finishReason, delta,moderationLevel);
 	}
 
 	private ChatCompletion.ChatCompletionDelta merge(ChatCompletion.ChatCompletionDelta previous,
 			ChatCompletion.ChatCompletionDelta current) {
 		String content = (current.content() != null ? current.content()
 				: "" + ((previous.content() != null) ? previous.content() : ""));
+		String reasoningContent = (current.reasoningContent() != null ? current.reasoningContent()
+				: "" + ((previous.reasoningContent() != null) ? previous.reasoningContent() : ""));
 		Role role = (current.role() != null ? current.role() : previous.role());
 		role = (role != null ? role : Role.assistant); // default to ASSISTANT (if null
 		// String name = (current.name() != null ? current.name() : previous.name());
@@ -100,7 +103,7 @@ public class HunYuanStreamFunctionCallingHelper {
 				toolCalls.add(lastPreviousTooCall);
 			}
 		}
-		return new ChatCompletion.ChatCompletionDelta(role, content, toolCalls);
+		return new ChatCompletion.ChatCompletionDelta(role, content, toolCalls,reasoningContent);
 	}
 
 	private ToolCall merge(ToolCall previous, ToolCall current) {

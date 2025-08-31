@@ -617,8 +617,8 @@ public class HunYuanApi {
 			this(content, role, null, null, null, null, null);
 		}
 
-		public ChatCompletionMessage(Object content, Role role, List<ToolCall> toolCalls) {
-			this(content, role, null, null, toolCalls, null, null);
+		public ChatCompletionMessage(Object content, Role role, List<ToolCall> toolCalls,String reasoningContent) {
+			this(content, role, null, null, toolCalls, null, reasoningContent);
 		}
 
 		public ChatCompletionMessage(Role role, List<ChatContent> chatContent) {
@@ -881,7 +881,8 @@ public class HunYuanApi {
 			@JsonProperty("Index") Integer index,
 			@JsonProperty("Message") ChatCompletionMessage message,
 			@JsonProperty("FinishReason") String finishReason,
-			@JsonProperty("Delta") ChatCompletionDelta delta
+			@JsonProperty("Delta") ChatCompletionDelta delta,
+			@JsonProperty("ModerationLevel") String moderationLevel
 		) {
 			 // @formatter:on
 		}
@@ -891,7 +892,8 @@ public class HunYuanApi {
 		// @formatter:off
 				@JsonProperty("Role") ChatCompletionMessage.Role role,
 				@JsonProperty("Content") String content,
-				@JsonProperty("ToolCalls") List<ChatCompletionMessage.ToolCall> toolCalls
+				@JsonProperty("ToolCalls") List<ChatCompletionMessage.ToolCall> toolCalls,
+				@JsonProperty("ReasoningContent") String reasoningContent
 		) {
 			// @formatter:on
 		}
