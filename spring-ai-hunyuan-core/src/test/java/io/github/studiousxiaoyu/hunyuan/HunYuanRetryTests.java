@@ -83,7 +83,7 @@ public class HunYuanRetryTests {
 	public void hunyuanChatTransientError() {
 
 		var choice = new ChatCompletion.Choice(0, new ChatCompletionMessage("Response123", Role.assistant),
-				ChatCompletionFinishReason.STOP.name(), null,null);
+				ChatCompletionFinishReason.STOP.name(), null, null);
 		ChatCompletion expectedChatCompletion = new ChatCompletion("id", null, 789L, "model", List.of(choice),
 				new HunYuanApi.Usage(10, 10, 10), null, null, null, null, null, null);
 		HunYuanApi.ChatCompletionResponse chatCompletionResponse = new HunYuanApi.ChatCompletionResponse(
@@ -113,7 +113,7 @@ public class HunYuanRetryTests {
 	public void hunYuanChatStreamTransientError() {
 
 		var choice = new ChatCompletion.Choice(0, null, ChatCompletionFinishReason.STOP.name(),
-				new ChatCompletion.ChatCompletionDelta(Role.assistant, "Response123", null,null),null);
+				new ChatCompletion.ChatCompletionDelta(Role.assistant, "Response123", null, null), null);
 		ChatCompletionChunk expectedChatCompletion = new ChatCompletionChunk("id", null, 789L, "model", List.of(choice),
 				null, null, null, null, null, null, null);
 		given(this.hunYuanApi.chatCompletionStream(isA(ChatCompletionRequest.class)))

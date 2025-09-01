@@ -414,10 +414,11 @@ public class HunYuanChatModel implements ChatModel {
 				chatCompletionMessage = new ChatCompletionMessage("", Role.assistant);
 			}
 			else {
-				chatCompletionMessage = new ChatCompletionMessage(delta.content(), delta.role(), delta.toolCalls(),delta.reasoningContent());
+				chatCompletionMessage = new ChatCompletionMessage(delta.content(), delta.role(), delta.toolCalls(),
+						delta.reasoningContent());
 			}
 			return new ChatCompletion.Choice(chunkChoice.index(), chatCompletionMessage, chunkChoice.finishReason(),
-					delta,chunkChoice.moderationLevel());
+					delta, chunkChoice.moderationLevel());
 		}).toList();
 
 		return new ChatCompletion(chunk.id(), chunk.errorMsg(), chunk.created(), chunk.note(), choices, chunk.usage(),

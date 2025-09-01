@@ -97,22 +97,21 @@ public class HunYuanChatModelThinkIT {
 		Prompt prompt = new Prompt(List.of(userMessage, systemMessage),
 				HunYuanChatOptions.builder().model(HunYuanApi.ChatModel.HUNYUAN_A13B.getName()).build());
 		String generationTextFromStream = this.streamingChatModel.stream(prompt)
-				.collectList()
-				.block()
-				.stream()
-				.map(ChatResponse::getResults)
-				.flatMap(List::stream)
-				.map(Generation::getOutput)
-				.map(message -> {
-					if (message instanceof HunYuanAssistantMessage) {
-						HunYuanAssistantMessage hunYuanMessage = (HunYuanAssistantMessage) message;
-						// 可以选择返回包含思考链和文本的对象，或者只返回需要的部分
-						return "think: " + hunYuanMessage.getReasoningContent() +
-								"/think " + hunYuanMessage.getText();
-					}
-					return message.getText();
-				})
-				.collect(Collectors.joining());
+			.collectList()
+			.block()
+			.stream()
+			.map(ChatResponse::getResults)
+			.flatMap(List::stream)
+			.map(Generation::getOutput)
+			.map(message -> {
+				if (message instanceof HunYuanAssistantMessage) {
+					HunYuanAssistantMessage hunYuanMessage = (HunYuanAssistantMessage) message;
+					// 可以选择返回包含思考链和文本的对象，或者只返回需要的部分
+					return "think: " + hunYuanMessage.getReasoningContent() + "/think " + hunYuanMessage.getText();
+				}
+				return message.getText();
+			})
+			.collect(Collectors.joining());
 		logger.info("Response: {}", generationTextFromStream);
 		assertThat(generationTextFromStream).isNotNull();
 		assertThat(generationTextFromStream).contains("Blackbeard");

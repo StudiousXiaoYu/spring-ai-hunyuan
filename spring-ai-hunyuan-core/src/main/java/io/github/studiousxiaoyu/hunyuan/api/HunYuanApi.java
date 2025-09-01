@@ -617,7 +617,7 @@ public class HunYuanApi {
 			this(content, role, null, null, null, null, null);
 		}
 
-		public ChatCompletionMessage(Object content, Role role, List<ToolCall> toolCalls,String reasoningContent) {
+		public ChatCompletionMessage(Object content, Role role, List<ToolCall> toolCalls, String reasoningContent) {
 			this(content, role, null, null, toolCalls, null, reasoningContent);
 		}
 
