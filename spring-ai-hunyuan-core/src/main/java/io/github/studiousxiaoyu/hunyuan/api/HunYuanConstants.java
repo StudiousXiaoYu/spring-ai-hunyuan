@@ -25,17 +25,24 @@ public final class HunYuanConstants {
 
 	public static final String DEFAULT_BASE_URL = "https://hunyuan.tencentcloudapi.com";
 
+	public static final String DEFAULT_TRANSCRIPTION_URL = "https://asr.tencentcloudapi.com";
+
 	public static final String DEFAULT_CHAT_HOST = "hunyuan.tencentcloudapi.com";
+
+	public static final String DEFAULT_TRANSCRIPTION_HOST = "asr.tencentcloudapi.com";
 
 	public static final String PROVIDER_NAME = "HUNYUAN";
 
 	public static final String DEFAULT_CHAT_ACTION = "ChatCompletions";
 
 	public static final String DEFAULT_EMBED_ACTION = "GetEmbedding";
+	public static final String DEFAULT_TRANSCRIPTION_ACTION = "SentenceRecognition";
 
 	public static final String DEFAULT_VERSION = "2023-09-01";
 
 	public static final String DEFAULT_SERVICE = "hunyuan";
+
+	public static final String DEFAULT_TRANSCRIPTION_SERVICE = "asr";
 
 	public static final String DEFAULT_ALGORITHM = "TC3-HMAC-SHA256";
 
