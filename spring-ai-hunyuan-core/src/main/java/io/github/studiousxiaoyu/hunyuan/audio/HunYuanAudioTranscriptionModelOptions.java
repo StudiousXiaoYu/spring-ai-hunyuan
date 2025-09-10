@@ -2,6 +2,8 @@ package io.github.studiousxiaoyu.hunyuan.audio;
 
 import org.springframework.ai.audio.transcription.AudioTranscriptionOptions;
 
+import java.util.Objects;
+
 public class HunYuanAudioTranscriptionModelOptions implements AudioTranscriptionOptions {
     @Override
     public String getModel() {
@@ -142,5 +144,91 @@ public class HunYuanAudioTranscriptionModelOptions implements AudioTranscription
 
     public void setInputSampleRate(String inputSampleRate) {
         this.inputSampleRate = inputSampleRate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HunYuanAudioTranscriptionModelOptions that = (HunYuanAudioTranscriptionModelOptions) o;
+        return Objects.equals(engSerViceType, that.engSerViceType) && Objects.equals(sourceType, that.sourceType) && Objects.equals(voiceFormat, that.voiceFormat) && Objects.equals(url, that.url) && Objects.equals(data, that.data) && Objects.equals(dataLen, that.dataLen) && Objects.equals(wordInfo, that.wordInfo) && Objects.equals(filterDirty, that.filterDirty) && Objects.equals(filterModal, that.filterModal) && Objects.equals(filterPunc, that.filterPunc) && Objects.equals(convertNumMode, that.convertNumMode) && Objects.equals(hotwordId, that.hotwordId) && Objects.equals(customizationId, that.customizationId) && Objects.equals(hotwordList, that.hotwordList) && Objects.equals(inputSampleRate, that.inputSampleRate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(engSerViceType, sourceType, voiceFormat, url, data, dataLen, wordInfo, filterDirty, filterModal, filterPunc, convertNumMode, hotwordId, customizationId, hotwordList, inputSampleRate);
+    }
+
+    public static class Builder {
+        private HunYuanAudioTranscriptionModelOptions options;
+        public Builder() {
+            options = new HunYuanAudioTranscriptionModelOptions();
+        }
+        public Builder withEngSerViceType(String engSerViceType) {
+            options.setEngSerViceType(engSerViceType);
+            return this;
+        }
+        public Builder withSourceType(String sourceType) {
+            options.setSourceType(sourceType);
+            return this;
+        }
+        public Builder withVoiceFormat(String voiceFormat) {
+            options.setVoiceFormat(voiceFormat);
+            return this;
+        }
+        public Builder withUrl(String url) {
+            options.setUrl(url);
+            return this;
+        }
+        public Builder withData(String data) {
+            options.setData(data);
+            return this;
+        }
+        public Builder withDataLen(Integer dataLen) {
+            options.setDataLen(dataLen);
+            return this;
+        }
+        public Builder withWordInfo(Integer wordInfo) {
+            options.setWordInfo(wordInfo);
+            return this;
+        }
+        public Builder withFilterDirty(Integer filterDirty) {
+            options.setFilterDirty(filterDirty);
+            return this;
+        }
+        public Builder withFilterModal(Integer filterModal) {
+            options.setFilterModal(filterModal);
+            return this;
+        }
+        public Builder withFilterPunc(Integer filterPunc) {
+            options.setFilterPunc(filterPunc);
+            return this;
+        }
+        public Builder withConvertNumMode(Integer convertNumMode) {
+            options.setConvertNumMode(convertNumMode);
+            return this;
+        }
+        public Builder withHotwordId(String hotwordId) {
+            options.setHotwordId(hotwordId);
+            return this;
+        }
+        public Builder withCustomizationId(String customizationId) {
+            options.setCustomizationId(customizationId);
+            return this;
+        }
+        public Builder withHotwordList(String hotwordList) {
+            options.setHotwordList(hotwordList);
+            return this;
+        }
+        public Builder withInputSampleRate(String inputSampleRate) {
+            options.setInputSampleRate(inputSampleRate);
+            return this;
+        }
+        public HunYuanAudioTranscriptionModelOptions build() {
+            return options;
+        }
+    }
+    public static Builder builder() {
+        return new Builder();
     }
 }

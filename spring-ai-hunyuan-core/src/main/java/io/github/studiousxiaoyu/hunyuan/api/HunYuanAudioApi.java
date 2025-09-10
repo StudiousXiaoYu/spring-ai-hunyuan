@@ -97,8 +97,9 @@ public class HunYuanAudioApi {
 		Consumer<HttpHeaders> jsonContentHeaders = headers -> {
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			headers.add("X-TC-Action", HunYuanConstants.DEFAULT_TRANSCRIPTION_ACTION);
+			headers.add("X-TC-Version", HunYuanConstants.DEFAULT_TRANSCRIPTION_VERSION);
 		};
-		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey);
+		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey,HunYuanConstants.DEFAULT_TRANSCRIPTION_HOST,HunYuanConstants.DEFAULT_TRANSCRIPTION_SERVICE);
 		hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey, HunYuanConstants.DEFAULT_TRANSCRIPTION_HOST,
 				HunYuanConstants.DEFAULT_TRANSCRIPTION_SERVICE);
 		this.restClient = restClientBuilder.baseUrl(baseUrl)
@@ -123,8 +124,9 @@ public class HunYuanAudioApi {
 		Consumer<HttpHeaders> jsonContentHeaders = headers -> {
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			headers.add("X-TC-Action", action);
+			headers.add("X-TC-Version", HunYuanConstants.DEFAULT_TRANSCRIPTION_VERSION);
 		};
-		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey);
+		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey,HunYuanConstants.DEFAULT_TRANSCRIPTION_HOST,HunYuanConstants.DEFAULT_TRANSCRIPTION_SERVICE);
 		hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey, HunYuanConstants.DEFAULT_TRANSCRIPTION_HOST,
 				HunYuanConstants.DEFAULT_TRANSCRIPTION_SERVICE);
 		this.restClient = restClientBuilder.baseUrl(baseUrl)
@@ -138,11 +140,13 @@ public class HunYuanAudioApi {
 
 	public ResponseEntity<TranscriptionResponse> createTranscription(TranscriptionRequest request, Class<TranscriptionResponse> transcriptionResponseClass) {
 
-		return this.restClient.post()
+		ResponseEntity<String> response = this.restClient.post()
 				.uri("/")
 				.body(request)
 				.retrieve()
-				.toEntity(transcriptionResponseClass);
+				.toEntity(String.class);
+		TranscriptionResponse transcriptionResponse = ModelOptionsUtils.jsonToObject(response.getBody(), transcriptionResponseClass);
+		return ResponseEntity.ok(transcriptionResponse);
 	}
 
 

@@ -112,6 +112,7 @@ public class HunYuanApi {
 		Consumer<HttpHeaders> jsonContentHeaders = headers -> {
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			headers.add("X-TC-Action", HunYuanConstants.DEFAULT_CHAT_ACTION);
+			headers.add("X-TC-Version", HunYuanConstants.DEFAULT_VERSION);
 		};
 		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey);
 		hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey, HunYuanConstants.DEFAULT_CHAT_HOST,
@@ -138,6 +139,7 @@ public class HunYuanApi {
 		Consumer<HttpHeaders> jsonContentHeaders = headers -> {
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			headers.add("X-TC-Action", action);
+			headers.add("X-TC-Version", HunYuanConstants.DEFAULT_VERSION);
 		};
 		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey);
 		hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey, HunYuanConstants.DEFAULT_CHAT_HOST,

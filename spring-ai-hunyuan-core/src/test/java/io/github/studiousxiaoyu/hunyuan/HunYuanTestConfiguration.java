@@ -17,7 +17,9 @@
 package io.github.studiousxiaoyu.hunyuan;
 
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
+import io.github.studiousxiaoyu.hunyuan.api.HunYuanAudioApi;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanEmbeddingModel;
+import io.github.studiousxiaoyu.hunyuan.audio.HunYuanAudioTranscriptionModel;
 import io.github.studiousxiaoyu.hunyuan.chat.HunYuanChatModel;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -48,6 +50,22 @@ public class HunYuanTestConfiguration {
 	@Bean
 	public HunYuanEmbeddingModel openAiEmbeddingModel(HunYuanApi api) {
 		return new HunYuanEmbeddingModel(api);
+	}
+
+	@Bean
+	public HunYuanAudioApi hunYuanAudioApi() {
+		var secretId = System.getenv("HUNYUAN_SECRET_ID");
+		var secretKey = System.getenv("HUNYUAN_SECRET_KEY");
+		if (!StringUtils.hasText(secretId) && !StringUtils.hasText(secretKey)) {
+			throw new IllegalArgumentException(
+					"Missing HUNYUAN_SECRET_ID & HUNYUAN_SECRET_KEY environment variable. Please set it to your HUNYUAN API info.");
+		}
+		return new HunYuanAudioApi(secretId, secretKey);
+	}
+
+	@Bean
+	public HunYuanAudioTranscriptionModel  hunYuanAudioTranscriptionModel(HunYuanAudioApi api) {
+		return new HunYuanAudioTranscriptionModel(api);
 	}
 
 }

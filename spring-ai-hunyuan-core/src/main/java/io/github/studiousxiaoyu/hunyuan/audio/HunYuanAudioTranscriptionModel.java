@@ -75,7 +75,7 @@ public class HunYuanAudioTranscriptionModel implements Model<AudioTranscriptionP
         }
 
         Resource instructions = transcriptionPrompt.getInstructions();
-        HunYuanAudioApi.TranscriptionRequest.Builder transcriptionRequestBuilder = HunYuanAudioApi.TranscriptionRequest.builder().engSerViceType(options.getModel()).voiceFormat(options.getVoiceFormat());
+        HunYuanAudioApi.TranscriptionRequest.Builder transcriptionRequestBuilder = HunYuanAudioApi.TranscriptionRequest.builder().engSerViceType(options.getEngSerViceType()).voiceFormat(options.getVoiceFormat());
         try {
             if (instructions instanceof UrlResource) {
                 URL url = instructions.getURL();
@@ -113,6 +113,9 @@ public class HunYuanAudioTranscriptionModel implements Model<AudioTranscriptionP
             source = new HunYuanAudioTranscriptionModelOptions();
         }
         HunYuanAudioTranscriptionModelOptions merged = new HunYuanAudioTranscriptionModelOptions();
+        merged.setEngSerViceType(source.getModel() != null ? source.getModel() : defaultOptions.getModel());
+        merged.setEngSerViceType(source.getEngSerViceType() !=null ? source.getEngSerViceType() : defaultOptions.getEngSerViceType());
+        merged.setSourceType(source.getSourceType() !=null ? source.getSourceType() : defaultOptions.getSourceType());
         merged.setCustomizationId(source.getCustomizationId() !=null ? source.getCustomizationId() : defaultOptions.getCustomizationId());
         merged.setConvertNumMode(source.getConvertNumMode() !=null ? source.getConvertNumMode() : defaultOptions.getConvertNumMode());
         merged.setFilterDirty(source.getFilterDirty() !=null ? source.getFilterDirty() : defaultOptions.getFilterDirty());

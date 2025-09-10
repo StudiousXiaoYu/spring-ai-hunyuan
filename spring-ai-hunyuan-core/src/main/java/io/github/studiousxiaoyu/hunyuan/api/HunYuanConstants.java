@@ -40,6 +40,8 @@ public final class HunYuanConstants {
 
 	public static final String DEFAULT_VERSION = "2023-09-01";
 
+	public static final String DEFAULT_TRANSCRIPTION_VERSION = "2019-06-14";
+
 	public static final String DEFAULT_SERVICE = "hunyuan";
 
 	public static final String DEFAULT_TRANSCRIPTION_SERVICE = "asr";
