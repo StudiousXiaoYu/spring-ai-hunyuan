@@ -27,6 +27,7 @@ import org.springframework.ai.openai.api.OpenAiAudioApi.TranscriptResponseFormat
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,6 +44,20 @@ class HunYuanAudioTranscriptionModelIT {
 	protected HunYuanAudioTranscriptionModel transcriptionModel;
 
 	@Test
+	void aiResponseContainsAiMetadata() {
+
+		Resource audioFile = new ClassPathResource("speech/speech1.mp3");
+
+		AudioTranscriptionPrompt transcriptionRequest = new AudioTranscriptionPrompt(audioFile);
+
+		AudioTranscriptionResponse response = this.transcriptionModel.call(transcriptionRequest);
+
+		assertThat(response).isNotNull();
+		assertThat(response.getResult().getOutput()).isNotNull();
+
+	}
+
+	@Test
 	void transcriptionTest() {
 		HunYuanAudioTranscriptionModelOptions transcriptionOptions = HunYuanAudioTranscriptionModelOptions.builder()
 				.withEngSerViceType(HunYuanAudioApi.TranscriptionModel.EIGHT_K_EN.getValue())
@@ -52,24 +67,7 @@ class HunYuanAudioTranscriptionModelIT {
 				transcriptionOptions);
 		AudioTranscriptionResponse response = this.transcriptionModel.call(transcriptionRequest);
 		assertThat(response.getResults()).hasSize(1);
-		assertThat(response.getResults().get(0).getOutput().toLowerCase().contains("fellow")).isTrue();
-	}
-
-	@Test
-	void transcriptionTestWithOptions() {
-		TranscriptResponseFormat responseFormat = TranscriptResponseFormat.VTT;
-
-		OpenAiAudioTranscriptionOptions transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
-			.language("en")
-			.prompt("Ask not this, but ask that")
-			.temperature(0f)
-			.responseFormat(responseFormat)
-			.build();
-		AudioTranscriptionPrompt transcriptionRequest = new AudioTranscriptionPrompt(this.audioFile,
-				transcriptionOptions);
-		AudioTranscriptionResponse response = this.transcriptionModel.call(transcriptionRequest);
-		assertThat(response.getResults()).hasSize(1);
-		assertThat(response.getResults().get(0).getOutput().toLowerCase().contains("fellow")).isTrue();
+		assertThat(response.getResults().get(0).getOutput().toLowerCase().contains("eisengard")).isTrue();
 	}
 
 }

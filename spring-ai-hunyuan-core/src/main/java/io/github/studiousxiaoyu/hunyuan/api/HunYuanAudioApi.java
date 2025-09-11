@@ -152,7 +152,7 @@ public class HunYuanAudioApi {
 
 	@JsonInclude(Include.NON_NULL)
 	public record TranscriptionRequest(@JsonProperty("EngSerViceType") String engSerViceType,
-									   @JsonProperty("SourceType") String sourceType,
+									   @JsonProperty("SourceType") Integer sourceType,
 									   @JsonProperty("VoiceFormat") String voiceFormat,
 									   @JsonProperty("Url") String url,
 									   @JsonProperty("Data") String data,
@@ -172,7 +172,7 @@ public class HunYuanAudioApi {
 
 		public static class Builder {
 			private String engSerViceType;
-			private String sourceType;
+			private Integer sourceType;
 			private String voiceFormat;
 			private String url;
 			private String data;
@@ -190,7 +190,7 @@ public class HunYuanAudioApi {
 				this.engSerViceType = engSerViceType;
 				return this;
 			}
-			public Builder sourceType(String sourceType) {
+			public Builder sourceType(Integer sourceType) {
 				this.sourceType = sourceType;
 				return this;
 			}
@@ -291,9 +291,15 @@ public class HunYuanAudioApi {
 		}
 
 	}
-
 	@JsonInclude(Include.NON_NULL)
-	public record TranscriptionResponse(@JsonProperty("Result") String result,
+	public record TranscriptionResponse(
+			// @formatter:off
+			@JsonProperty("Response") TranscriptionDetail response
+	) {
+		// @formatter:on
+	}
+	@JsonInclude(Include.NON_NULL)
+	public record TranscriptionDetail(@JsonProperty("Result") String result,
 									   @JsonProperty("AudioDuration") Integer audioDuration,
 									   @JsonProperty("WordSize") Integer wordSize,
 									   @JsonProperty("WordList") List<SentenceWord> WordList,

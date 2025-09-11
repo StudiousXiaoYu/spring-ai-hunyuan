@@ -2,7 +2,6 @@ package io.github.studiousxiaoyu.hunyuan.audio;
 
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanApi;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanAudioApi;
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.audio.transcription.AudioTranscription;
@@ -19,6 +18,7 @@ import org.springframework.retry.support.RetryTemplate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Base64;
 
 public class HunYuanAudioTranscriptionModel implements Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> {
 
@@ -28,7 +28,10 @@ public class HunYuanAudioTranscriptionModel implements Model<AudioTranscriptionP
     private final HunYuanAudioTranscriptionModelOptions defaultOptions;
 
     public HunYuanAudioTranscriptionModel(HunYuanAudioApi hunYuanAudioApi) {
-        this(hunYuanAudioApi, new HunYuanAudioTranscriptionModelOptions());
+        this(hunYuanAudioApi, HunYuanAudioTranscriptionModelOptions.builder()
+                .withEngSerViceType(HunYuanAudioApi.TranscriptionModel.SIXTEEN_K_ZH_PY.getValue())
+                .withVoiceFormat("mp3")
+                .build());
     }
 
     public HunYuanAudioTranscriptionModel(HunYuanAudioApi hunYuanAudioApi, HunYuanAudioTranscriptionModelOptions options) {
@@ -55,7 +58,7 @@ public class HunYuanAudioTranscriptionModel implements Model<AudioTranscriptionP
             return new AudioTranscriptionResponse(null);
         }
 
-        AudioTranscription transcript = new AudioTranscription(transcription.result());
+        AudioTranscription transcript = new AudioTranscription(transcription.response().result());
 
         return new AudioTranscriptionResponse(transcript);
     }
@@ -79,11 +82,11 @@ public class HunYuanAudioTranscriptionModel implements Model<AudioTranscriptionP
         try {
             if (instructions instanceof UrlResource) {
                 URL url = instructions.getURL();
-                transcriptionRequestBuilder.url(url.toString()).sourceType("0");
+                transcriptionRequestBuilder.url(url.toString()).sourceType(0);
             } else {
                 //语音数据，当SourceType 值为1（本地语音数据上传）时必须填写，当SourceType 值为0（语音 URL上传）可不写。要使用base64编码(采用python语言时注意读取文件应该为string而不是byte，以byte格式读取后要decode()。编码后的数据不可带有回车换行符)。音频时长不能超过60s，音频文件大小不能超过3MB（Base64后）。
                 String cfd = toBase64(instructions.getInputStream());
-                transcriptionRequestBuilder.data(cfd).dataLen(cfd.length()).sourceType("1");
+                transcriptionRequestBuilder.data(cfd).dataLen(cfd.length()).sourceType(1);
             }
         }catch (IOException e) {
             throw new RuntimeException(e);
@@ -102,7 +105,7 @@ public class HunYuanAudioTranscriptionModel implements Model<AudioTranscriptionP
 
     private String toBase64(InputStream inputStream) {
         try {
-            return Base64.encodeBase64String(inputStream.readAllBytes());
+            return Base64.getEncoder().encodeToString(inputStream.readAllBytes()).replaceAll("\r|\n", "");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
