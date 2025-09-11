@@ -43,7 +43,10 @@ public class HunYuanAudioTranscriptionModel implements Model<AudioTranscriptionP
         this.hunYuanAudioApi = hunYuanAudioApi;
         this.defaultOptions = options;
     }
-
+    public String call(Resource audioResource) {
+        AudioTranscriptionPrompt transcriptionRequest = new AudioTranscriptionPrompt(audioResource);
+        return call(transcriptionRequest).getResult().getOutput();
+    }
     @Override
     public AudioTranscriptionResponse call(AudioTranscriptionPrompt transcriptionPrompt) {
         Resource audioResource = transcriptionPrompt.getInstructions();

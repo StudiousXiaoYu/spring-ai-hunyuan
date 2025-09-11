@@ -164,6 +164,10 @@ public class HunYuanAudioTranscriptionModelOptions implements AudioTranscription
         public Builder() {
             options = new HunYuanAudioTranscriptionModelOptions();
         }
+        public Builder withModel(String model) {
+            options.setEngSerViceType(model);
+            return this;
+        }
         public Builder withEngSerViceType(String engSerViceType) {
             options.setEngSerViceType(engSerViceType);
             return this;
