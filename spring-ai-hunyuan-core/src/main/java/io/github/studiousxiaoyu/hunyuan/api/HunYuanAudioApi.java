@@ -54,11 +54,7 @@ public class HunYuanAudioApi {
 
 	private final RestClient restClient;
 
-	private final WebClient webClient;
-
 	private final ApiAuthHttpRequestInterceptor apiAuthHttpRequestInterceptor;
-
-	private final HunYuanAuthApi hunYuanAuthApi;
 
 	/**
 	 * Create a new client api with DEFAULT_TRANSCRIPTION_URL
@@ -79,38 +75,6 @@ public class HunYuanAudioApi {
 		this(baseUrl, secretId, secretKey, HunYuanConstants.DEFAULT_TRANSCRIPTION_ACTION, RestClient.builder(),
 				RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
 	}
-
-	public HunYuanAudioApi(String baseUrl, String secretId, String secretKey, String action) {
-		this(baseUrl, secretId, secretKey, action, RestClient.builder(), RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER);
-	}
-
-	/**
-	 * Create a new client api.
-	 * @param baseUrl api base URL.
-	 * @param secretKey Hunyuan api Key.
-	 * @param restClientBuilder RestClient builder.
-	 * @param responseErrorHandler Response error handler.
-	 */
-	public HunYuanAudioApi(String baseUrl, String secretId, String secretKey, RestClient.Builder restClientBuilder,
-                           ResponseErrorHandler responseErrorHandler) {
-
-		Consumer<HttpHeaders> jsonContentHeaders = headers -> {
-			headers.setContentType(MediaType.APPLICATION_JSON);
-			headers.add("X-TC-Action", HunYuanConstants.DEFAULT_TRANSCRIPTION_ACTION);
-			headers.add("X-TC-Version", HunYuanConstants.DEFAULT_TRANSCRIPTION_VERSION);
-		};
-		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey,HunYuanConstants.DEFAULT_TRANSCRIPTION_HOST,HunYuanConstants.DEFAULT_TRANSCRIPTION_SERVICE);
-		hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey, HunYuanConstants.DEFAULT_TRANSCRIPTION_HOST,
-				HunYuanConstants.DEFAULT_TRANSCRIPTION_SERVICE);
-		this.restClient = restClientBuilder.baseUrl(baseUrl)
-			.defaultHeaders(jsonContentHeaders)
-			.defaultStatusHandler(responseErrorHandler)
-			.requestInterceptor(apiAuthHttpRequestInterceptor)
-			.build();
-
-		this.webClient = WebClient.builder().baseUrl(baseUrl).defaultHeaders(jsonContentHeaders).build();
-	}
-
 	/**
 	 * Create a new client api.
 	 * @param baseUrl api base URL.
@@ -127,15 +91,11 @@ public class HunYuanAudioApi {
 			headers.add("X-TC-Version", HunYuanConstants.DEFAULT_TRANSCRIPTION_VERSION);
 		};
 		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey,HunYuanConstants.DEFAULT_TRANSCRIPTION_HOST,HunYuanConstants.DEFAULT_TRANSCRIPTION_SERVICE);
-		hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey, HunYuanConstants.DEFAULT_TRANSCRIPTION_HOST,
-				HunYuanConstants.DEFAULT_TRANSCRIPTION_SERVICE);
 		this.restClient = restClientBuilder.baseUrl(baseUrl)
 			.defaultHeaders(jsonContentHeaders)
 			.defaultStatusHandler(responseErrorHandler)
 			.requestInterceptor(apiAuthHttpRequestInterceptor)
 			.build();
-
-		this.webClient = WebClient.builder().baseUrl(baseUrl).defaultHeaders(jsonContentHeaders).build();
 	}
 
 	public ResponseEntity<TranscriptionResponse> createTranscription(TranscriptionRequest request, Class<TranscriptionResponse> transcriptionResponseClass) {

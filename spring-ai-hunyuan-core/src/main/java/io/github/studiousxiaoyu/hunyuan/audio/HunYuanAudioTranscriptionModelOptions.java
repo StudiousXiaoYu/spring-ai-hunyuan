@@ -1,15 +1,13 @@
 package io.github.studiousxiaoyu.hunyuan.audio;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.ai.audio.transcription.AudioTranscriptionOptions;
 
 import java.util.Objects;
 
 public class HunYuanAudioTranscriptionModelOptions implements AudioTranscriptionOptions {
-    @Override
-    public String getModel() {
-        return "";
-    }
 
+    private String model;
     private String engSerViceType;
     private String sourceType;
     private String voiceFormat;
@@ -25,7 +23,10 @@ public class HunYuanAudioTranscriptionModelOptions implements AudioTranscription
     private String customizationId;
     private String hotwordList;
     private String inputSampleRate;
-
+    @Override
+    public String getModel() {
+        return model;
+    }
     public String getEngSerViceType() {
         return engSerViceType;
     }
@@ -146,6 +147,10 @@ public class HunYuanAudioTranscriptionModelOptions implements AudioTranscription
         this.inputSampleRate = inputSampleRate;
     }
 
+    public void setModel(String model) {
+        this.model = model;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -165,7 +170,7 @@ public class HunYuanAudioTranscriptionModelOptions implements AudioTranscription
             options = new HunYuanAudioTranscriptionModelOptions();
         }
         public Builder withModel(String model) {
-            options.setEngSerViceType(model);
+            options.setModel(model);
             return this;
         }
         public Builder withEngSerViceType(String engSerViceType) {

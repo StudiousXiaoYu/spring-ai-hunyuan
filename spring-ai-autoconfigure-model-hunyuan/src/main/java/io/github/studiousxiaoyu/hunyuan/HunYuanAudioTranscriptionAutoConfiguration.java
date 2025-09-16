@@ -52,24 +52,22 @@ public class HunYuanAudioTranscriptionAutoConfiguration {
 			HunYuanAudioTranscriptionProperties chatProperties) {
 
 		var hunyuanApi = hunYuanAudioApi(chatProperties.getSecretId(), commonProperties.getSecretId(),
-				chatProperties.getSecretKey(), commonProperties.getSecretKey(), chatProperties.getBaseUrl(),
-				commonProperties.getBaseUrl());
+				chatProperties.getSecretKey(), commonProperties.getSecretKey(), chatProperties.getBaseUrl());
 
 		return new HunYuanAudioTranscriptionModel(hunyuanApi);
 	}
 
 	private HunYuanAudioApi hunYuanAudioApi(String secretId, String commonSecretId, String secretKey, String commonSecretKey,
-								  String baseUrl, String commonBaseUrl) {
+								  String baseUrl) {
 
 		var resolvedSecretId = StringUtils.hasText(secretId) ? secretId : commonSecretId;
 		var resolvedSecretKey = StringUtils.hasText(secretKey) ? secretKey : commonSecretKey;
-		var resoledBaseUrl = StringUtils.hasText(baseUrl) ? baseUrl : commonBaseUrl;
 
 		Assert.hasText(resolvedSecretId, "HunYuan SecretId must be set");
 		Assert.hasText(resolvedSecretKey, "HunYuan SecretKey must be set");
-		Assert.hasText(resoledBaseUrl, "HunYuan base URL must be set");
+		Assert.hasText(baseUrl, "Audio base URL must be set");
 
-		return new HunYuanAudioApi(resoledBaseUrl, resolvedSecretId, resolvedSecretKey);
+		return new HunYuanAudioApi(baseUrl, resolvedSecretId, resolvedSecretKey);
 	}
 
 }

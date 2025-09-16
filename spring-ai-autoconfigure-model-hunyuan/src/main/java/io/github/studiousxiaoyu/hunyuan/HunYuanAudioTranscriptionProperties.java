@@ -17,6 +17,7 @@
 package io.github.studiousxiaoyu.hunyuan;
 
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanAudioApi;
+import io.github.studiousxiaoyu.hunyuan.api.HunYuanConstants;
 import io.github.studiousxiaoyu.hunyuan.audio.HunYuanAudioTranscriptionModelOptions;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -31,6 +32,11 @@ public class HunYuanAudioTranscriptionProperties extends HunYuanParentProperties
 
 	public static final String DEFAULT_AUDIO_FORMAT = "mp3";
 
+	public static final String DEFAULT_AUDIO_BASE_URL = HunYuanConstants.DEFAULT_TRANSCRIPTION_URL;
+
+	public HunYuanAudioTranscriptionProperties() {
+		super.setBaseUrl(DEFAULT_AUDIO_BASE_URL);
+	}
 
 	@NestedConfigurationProperty
 	private HunYuanAudioTranscriptionModelOptions options = HunYuanAudioTranscriptionModelOptions.builder().withModel(DEFAULT_AUDIO_MODEL).withVoiceFormat(DEFAULT_AUDIO_FORMAT).build();
