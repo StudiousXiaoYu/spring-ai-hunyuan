@@ -103,10 +103,10 @@ public class HunYuanAuthApi {
 	 * request.
 	 */
 	public MultiValueMap<String, String> getHttpHeadersConsumer(String action, byte[] body) {
-		return getHttpHeadersConsumer(action,HunYuanConstants.DEFAULT_VERSION, body);
+		return getHttpHeadersConsumer(action, HunYuanConstants.DEFAULT_VERSION, body);
 	}
 
-	public MultiValueMap<String, String> getHttpHeadersConsumer(String action, String version,byte[] body) {
+	public MultiValueMap<String, String> getHttpHeadersConsumer(String action, String version, byte[] body) {
 		// String timestamp = "1551113065";
 		String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

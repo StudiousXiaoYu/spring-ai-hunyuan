@@ -6,21 +6,23 @@ import org.springframework.ai.model.ModelResponse;
 import java.util.List;
 
 public class AudioTextToVoiceResponse implements ModelResponse<AudioTextToVoiceResult> {
-    private final AudioTextToVoiceResult transcript;
 
-    public AudioTextToVoiceResponse(AudioTextToVoiceResult transcript) {
-        this.transcript = transcript;
-    }
+	private final AudioTextToVoiceResult transcript;
 
-    public AudioTextToVoiceResult getResult() {
-        return this.transcript;
-    }
+	public AudioTextToVoiceResponse(AudioTextToVoiceResult transcript) {
+		this.transcript = transcript;
+	}
 
-    public List<AudioTextToVoiceResult> getResults() {
-        return List.of(this.transcript);
-    }
+	public AudioTextToVoiceResult getResult() {
+		return this.transcript;
+	}
 
-    public AudioTranscriptionResponseMetadata getMetadata() {
-        return null;
-    }
+	public List<AudioTextToVoiceResult> getResults() {
+		return List.of(this.transcript);
+	}
+
+	public AudioTranscriptionResponseMetadata getMetadata() {
+		return null;
+	}
+
 }

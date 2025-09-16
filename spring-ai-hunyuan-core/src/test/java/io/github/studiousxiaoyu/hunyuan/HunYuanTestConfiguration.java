@@ -64,7 +64,7 @@ public class HunYuanTestConfiguration {
 	}
 
 	@Bean
-	public HunYuanAudioTranscriptionModel  hunYuanAudioTranscriptionModel(HunYuanAudioApi api) {
+	public HunYuanAudioTranscriptionModel hunYuanAudioTranscriptionModel(HunYuanAudioApi api) {
 		return new HunYuanAudioTranscriptionModel(api);
 	}
 

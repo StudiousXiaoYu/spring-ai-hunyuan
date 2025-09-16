@@ -60,8 +60,8 @@ class HunYuanAudioTranscriptionModelIT {
 	@Test
 	void transcriptionTest() {
 		HunYuanAudioTranscriptionModelOptions transcriptionOptions = HunYuanAudioTranscriptionModelOptions.builder()
-				.withEngSerViceType(HunYuanAudioApi.TranscriptionModel.EIGHT_K_EN.getValue())
-				.withVoiceFormat("mp3")
+			.withEngSerViceType(HunYuanAudioApi.TranscriptionModel.EIGHT_K_EN.getValue())
+			.withVoiceFormat("mp3")
 			.build();
 		AudioTranscriptionPrompt transcriptionRequest = new AudioTranscriptionPrompt(this.audioFile,
 				transcriptionOptions);

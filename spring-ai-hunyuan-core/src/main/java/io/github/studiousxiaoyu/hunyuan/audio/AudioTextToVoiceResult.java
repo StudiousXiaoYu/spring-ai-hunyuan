@@ -1,26 +1,24 @@
 package io.github.studiousxiaoyu.hunyuan.audio;
 
-import org.springframework.ai.audio.transcription.AudioTranscriptionResponseMetadata;
-import org.springframework.ai.model.ModelResponse;
 import org.springframework.ai.model.ModelResult;
 import org.springframework.ai.model.ResultMetadata;
 
-import java.util.List;
+public class AudioTextToVoiceResult implements ModelResult<byte[]> {
 
-public class AudioTextToVoiceResult implements ModelResult<String> {
+	private final byte[] text;
 
-    private final String text;
+	public AudioTextToVoiceResult(byte[] text) {
+		this.text = text;
+	}
 
-    public AudioTextToVoiceResult(String text) {
-        this.text = text;
-    }
-    @Override
-    public String getOutput() {
-        return text;
-    }
+	@Override
+	public byte[] getOutput() {
+		return text;
+	}
 
-    @Override
-    public ResultMetadata getMetadata() {
-        return null;
-    }
+	@Override
+	public ResultMetadata getMetadata() {
+		return null;
+	}
+
 }

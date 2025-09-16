@@ -17,6 +17,8 @@
 package io.github.studiousxiaoyu.hunyuan;
 
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanAudioApi;
+import io.github.studiousxiaoyu.hunyuan.api.HunYuanConstants;
+import io.github.studiousxiaoyu.hunyuan.audio.HunYuanAudioTextToVoiceModel;
 import io.github.studiousxiaoyu.hunyuan.audio.HunYuanAudioTranscriptionModel;
 import org.springframework.ai.retry.autoconfigure.SpringAiRetryAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -38,23 +40,23 @@ import org.springframework.util.StringUtils;
  */
 @AutoConfiguration(after = { RestClientAutoConfiguration.class, WebClientAutoConfiguration.class,
 		SpringAiRetryAutoConfiguration.class })
-@EnableConfigurationProperties({ HunYuanCommonProperties.class, HunYuanAudioTranscriptionProperties.class })
+@EnableConfigurationProperties({ HunYuanCommonProperties.class, HunYuanAudioTextToVoiceProperties.class })
 @ConditionalOnClass(HunYuanAudioApi.class)
 @ImportAutoConfiguration(classes = { SpringAiRetryAutoConfiguration.class, RestClientAutoConfiguration.class,
 		WebClientAutoConfiguration.class })
-public class HunYuanAudioTranscriptionAutoConfiguration {
+public class HunYuanAudioTextToVoiceAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(prefix = HunYuanAudioTranscriptionProperties.CONFIG_PREFIX, name = "enabled",
+	@ConditionalOnProperty(prefix = HunYuanAudioTextToVoiceProperties.CONFIG_PREFIX, name = "enabled",
 			havingValue = "true", matchIfMissing = true)
-	public HunYuanAudioTranscriptionModel hunYuanAudioTranscriptionModel(HunYuanCommonProperties commonProperties,
-			HunYuanAudioTranscriptionProperties chatProperties) {
+	public HunYuanAudioTextToVoiceModel hunYuanAudioTextToVoiceModel(HunYuanCommonProperties commonProperties,
+			HunYuanAudioTextToVoiceProperties chatProperties) {
 
 		var hunyuanApi = hunYuanAudioApi(chatProperties.getSecretId(), commonProperties.getSecretId(),
 				chatProperties.getSecretKey(), commonProperties.getSecretKey(), chatProperties.getBaseUrl());
 
-		return new HunYuanAudioTranscriptionModel(hunyuanApi);
+		return new HunYuanAudioTextToVoiceModel(hunyuanApi);
 	}
 
 	private HunYuanAudioApi hunYuanAudioApi(String secretId, String commonSecretId, String secretKey,
@@ -67,7 +69,9 @@ public class HunYuanAudioTranscriptionAutoConfiguration {
 		Assert.hasText(resolvedSecretKey, "HunYuan SecretKey must be set");
 		Assert.hasText(baseUrl, "Audio base URL must be set");
 
-		return new HunYuanAudioApi(baseUrl, resolvedSecretId, resolvedSecretKey);
+		return new HunYuanAudioApi(baseUrl, resolvedSecretId, resolvedSecretKey, HunYuanConstants.DEFAULT_TTS_ACTION,
+				HunYuanConstants.DEFAULT_TTS_SERVICE, HunYuanConstants.DEFAULT_TTS_HOST,
+				HunYuanConstants.DEFAULT_TTS_VERSION);
 	}
 
 }

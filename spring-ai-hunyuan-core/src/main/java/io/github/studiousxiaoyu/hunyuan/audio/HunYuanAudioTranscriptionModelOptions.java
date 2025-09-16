@@ -7,237 +7,287 @@ import java.util.Objects;
 
 public class HunYuanAudioTranscriptionModelOptions implements AudioTranscriptionOptions {
 
-    private String model;
-    private String engSerViceType;
-    private String sourceType;
-    private String voiceFormat;
-    private String url;
-    private String data;
-    private Integer dataLen;
-    private Integer wordInfo;
-    private Integer filterDirty;
-    private Integer filterModal;
-    private Integer filterPunc;
-    private Integer convertNumMode;
-    private String hotwordId;
-    private String customizationId;
-    private String hotwordList;
-    private String inputSampleRate;
-    @Override
-    public String getModel() {
-        return model;
-    }
-    public String getEngSerViceType() {
-        return engSerViceType;
-    }
+	private String model;
 
-    public void setEngSerViceType(String engSerViceType) {
-        this.engSerViceType = engSerViceType;
-    }
+	private String engSerViceType;
 
-    public String getSourceType() {
-        return sourceType;
-    }
+	private String sourceType;
 
-    public void setSourceType(String sourceType) {
-        this.sourceType = sourceType;
-    }
+	private String voiceFormat;
 
-    public String getVoiceFormat() {
-        return voiceFormat;
-    }
+	private String url;
 
-    public void setVoiceFormat(String voiceFormat) {
-        this.voiceFormat = voiceFormat;
-    }
+	private String data;
 
-    public String getUrl() {
-        return url;
-    }
+	private Integer dataLen;
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
+	private Integer wordInfo;
 
-    public String getData() {
-        return data;
-    }
+	private Integer filterDirty;
 
-    public void setData(String data) {
-        this.data = data;
-    }
+	private Integer filterModal;
 
-    public Integer getDataLen() {
-        return dataLen;
-    }
+	private Integer filterPunc;
 
-    public void setDataLen(Integer dataLen) {
-        this.dataLen = dataLen;
-    }
+	private Integer convertNumMode;
 
-    public Integer getWordInfo() {
-        return wordInfo;
-    }
+	private String hotwordId;
 
-    public void setWordInfo(Integer wordInfo) {
-        this.wordInfo = wordInfo;
-    }
+	private String customizationId;
 
-    public Integer getFilterDirty() {
-        return filterDirty;
-    }
+	private String hotwordList;
 
-    public void setFilterDirty(Integer filterDirty) {
-        this.filterDirty = filterDirty;
-    }
+	private String inputSampleRate;
 
-    public Integer getFilterModal() {
-        return filterModal;
-    }
+	@Override
+	public String getModel() {
+		return model;
+	}
 
-    public void setFilterModal(Integer filterModal) {
-        this.filterModal = filterModal;
-    }
+	public String getEngSerViceType() {
+		return engSerViceType;
+	}
 
-    public Integer getFilterPunc() {
-        return filterPunc;
-    }
+	public void setEngSerViceType(String engSerViceType) {
+		this.engSerViceType = engSerViceType;
+	}
 
-    public void setFilterPunc(Integer filterPunc) {
-        this.filterPunc = filterPunc;
-    }
+	public String getSourceType() {
+		return sourceType;
+	}
 
-    public Integer getConvertNumMode() {
-        return convertNumMode;
-    }
+	public void setSourceType(String sourceType) {
+		this.sourceType = sourceType;
+	}
 
-    public void setConvertNumMode(Integer convertNumMode) {
-        this.convertNumMode = convertNumMode;
-    }
+	public String getVoiceFormat() {
+		return voiceFormat;
+	}
 
-    public String getHotwordId() {
-        return hotwordId;
-    }
+	public void setVoiceFormat(String voiceFormat) {
+		this.voiceFormat = voiceFormat;
+	}
 
-    public void setHotwordId(String hotwordId) {
-        this.hotwordId = hotwordId;
-    }
+	public String getUrl() {
+		return url;
+	}
 
-    public String getCustomizationId() {
-        return customizationId;
-    }
+	public void setUrl(String url) {
+		this.url = url;
+	}
 
-    public void setCustomizationId(String customizationId) {
-        this.customizationId = customizationId;
-    }
+	public String getData() {
+		return data;
+	}
 
-    public String getHotwordList() {
-        return hotwordList;
-    }
+	public void setData(String data) {
+		this.data = data;
+	}
 
-    public void setHotwordList(String hotwordList) {
-        this.hotwordList = hotwordList;
-    }
+	public Integer getDataLen() {
+		return dataLen;
+	}
 
-    public String getInputSampleRate() {
-        return inputSampleRate;
-    }
+	public void setDataLen(Integer dataLen) {
+		this.dataLen = dataLen;
+	}
 
-    public void setInputSampleRate(String inputSampleRate) {
-        this.inputSampleRate = inputSampleRate;
-    }
+	public Integer getWordInfo() {
+		return wordInfo;
+	}
 
-    public void setModel(String model) {
-        this.model = model;
-    }
+	public void setWordInfo(Integer wordInfo) {
+		this.wordInfo = wordInfo;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        HunYuanAudioTranscriptionModelOptions that = (HunYuanAudioTranscriptionModelOptions) o;
-        return Objects.equals(engSerViceType, that.engSerViceType) && Objects.equals(sourceType, that.sourceType) && Objects.equals(voiceFormat, that.voiceFormat) && Objects.equals(url, that.url) && Objects.equals(data, that.data) && Objects.equals(dataLen, that.dataLen) && Objects.equals(wordInfo, that.wordInfo) && Objects.equals(filterDirty, that.filterDirty) && Objects.equals(filterModal, that.filterModal) && Objects.equals(filterPunc, that.filterPunc) && Objects.equals(convertNumMode, that.convertNumMode) && Objects.equals(hotwordId, that.hotwordId) && Objects.equals(customizationId, that.customizationId) && Objects.equals(hotwordList, that.hotwordList) && Objects.equals(inputSampleRate, that.inputSampleRate);
-    }
+	public Integer getFilterDirty() {
+		return filterDirty;
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(engSerViceType, sourceType, voiceFormat, url, data, dataLen, wordInfo, filterDirty, filterModal, filterPunc, convertNumMode, hotwordId, customizationId, hotwordList, inputSampleRate);
-    }
+	public void setFilterDirty(Integer filterDirty) {
+		this.filterDirty = filterDirty;
+	}
 
-    public static class Builder {
-        private HunYuanAudioTranscriptionModelOptions options;
-        public Builder() {
-            options = new HunYuanAudioTranscriptionModelOptions();
-        }
-        public Builder withModel(String model) {
-            options.setModel(model);
-            return this;
-        }
-        public Builder withEngSerViceType(String engSerViceType) {
-            options.setEngSerViceType(engSerViceType);
-            return this;
-        }
-        public Builder withSourceType(String sourceType) {
-            options.setSourceType(sourceType);
-            return this;
-        }
-        public Builder withVoiceFormat(String voiceFormat) {
-            options.setVoiceFormat(voiceFormat);
-            return this;
-        }
-        public Builder withUrl(String url) {
-            options.setUrl(url);
-            return this;
-        }
-        public Builder withData(String data) {
-            options.setData(data);
-            return this;
-        }
-        public Builder withDataLen(Integer dataLen) {
-            options.setDataLen(dataLen);
-            return this;
-        }
-        public Builder withWordInfo(Integer wordInfo) {
-            options.setWordInfo(wordInfo);
-            return this;
-        }
-        public Builder withFilterDirty(Integer filterDirty) {
-            options.setFilterDirty(filterDirty);
-            return this;
-        }
-        public Builder withFilterModal(Integer filterModal) {
-            options.setFilterModal(filterModal);
-            return this;
-        }
-        public Builder withFilterPunc(Integer filterPunc) {
-            options.setFilterPunc(filterPunc);
-            return this;
-        }
-        public Builder withConvertNumMode(Integer convertNumMode) {
-            options.setConvertNumMode(convertNumMode);
-            return this;
-        }
-        public Builder withHotwordId(String hotwordId) {
-            options.setHotwordId(hotwordId);
-            return this;
-        }
-        public Builder withCustomizationId(String customizationId) {
-            options.setCustomizationId(customizationId);
-            return this;
-        }
-        public Builder withHotwordList(String hotwordList) {
-            options.setHotwordList(hotwordList);
-            return this;
-        }
-        public Builder withInputSampleRate(String inputSampleRate) {
-            options.setInputSampleRate(inputSampleRate);
-            return this;
-        }
-        public HunYuanAudioTranscriptionModelOptions build() {
-            return options;
-        }
-    }
-    public static Builder builder() {
-        return new Builder();
-    }
+	public Integer getFilterModal() {
+		return filterModal;
+	}
+
+	public void setFilterModal(Integer filterModal) {
+		this.filterModal = filterModal;
+	}
+
+	public Integer getFilterPunc() {
+		return filterPunc;
+	}
+
+	public void setFilterPunc(Integer filterPunc) {
+		this.filterPunc = filterPunc;
+	}
+
+	public Integer getConvertNumMode() {
+		return convertNumMode;
+	}
+
+	public void setConvertNumMode(Integer convertNumMode) {
+		this.convertNumMode = convertNumMode;
+	}
+
+	public String getHotwordId() {
+		return hotwordId;
+	}
+
+	public void setHotwordId(String hotwordId) {
+		this.hotwordId = hotwordId;
+	}
+
+	public String getCustomizationId() {
+		return customizationId;
+	}
+
+	public void setCustomizationId(String customizationId) {
+		this.customizationId = customizationId;
+	}
+
+	public String getHotwordList() {
+		return hotwordList;
+	}
+
+	public void setHotwordList(String hotwordList) {
+		this.hotwordList = hotwordList;
+	}
+
+	public String getInputSampleRate() {
+		return inputSampleRate;
+	}
+
+	public void setInputSampleRate(String inputSampleRate) {
+		this.inputSampleRate = inputSampleRate;
+	}
+
+	public void setModel(String model) {
+		this.model = model;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		HunYuanAudioTranscriptionModelOptions that = (HunYuanAudioTranscriptionModelOptions) o;
+		return Objects.equals(engSerViceType, that.engSerViceType) && Objects.equals(sourceType, that.sourceType)
+				&& Objects.equals(voiceFormat, that.voiceFormat) && Objects.equals(url, that.url)
+				&& Objects.equals(data, that.data) && Objects.equals(dataLen, that.dataLen)
+				&& Objects.equals(wordInfo, that.wordInfo) && Objects.equals(filterDirty, that.filterDirty)
+				&& Objects.equals(filterModal, that.filterModal) && Objects.equals(filterPunc, that.filterPunc)
+				&& Objects.equals(convertNumMode, that.convertNumMode) && Objects.equals(hotwordId, that.hotwordId)
+				&& Objects.equals(customizationId, that.customizationId)
+				&& Objects.equals(hotwordList, that.hotwordList)
+				&& Objects.equals(inputSampleRate, that.inputSampleRate);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(engSerViceType, sourceType, voiceFormat, url, data, dataLen, wordInfo, filterDirty,
+				filterModal, filterPunc, convertNumMode, hotwordId, customizationId, hotwordList, inputSampleRate);
+	}
+
+	public static class Builder {
+
+		private HunYuanAudioTranscriptionModelOptions options;
+
+		public Builder() {
+			options = new HunYuanAudioTranscriptionModelOptions();
+		}
+
+		public Builder withModel(String model) {
+			options.setModel(model);
+			return this;
+		}
+
+		public Builder withEngSerViceType(String engSerViceType) {
+			options.setEngSerViceType(engSerViceType);
+			return this;
+		}
+
+		public Builder withSourceType(String sourceType) {
+			options.setSourceType(sourceType);
+			return this;
+		}
+
+		public Builder withVoiceFormat(String voiceFormat) {
+			options.setVoiceFormat(voiceFormat);
+			return this;
+		}
+
+		public Builder withUrl(String url) {
+			options.setUrl(url);
+			return this;
+		}
+
+		public Builder withData(String data) {
+			options.setData(data);
+			return this;
+		}
+
+		public Builder withDataLen(Integer dataLen) {
+			options.setDataLen(dataLen);
+			return this;
+		}
+
+		public Builder withWordInfo(Integer wordInfo) {
+			options.setWordInfo(wordInfo);
+			return this;
+		}
+
+		public Builder withFilterDirty(Integer filterDirty) {
+			options.setFilterDirty(filterDirty);
+			return this;
+		}
+
+		public Builder withFilterModal(Integer filterModal) {
+			options.setFilterModal(filterModal);
+			return this;
+		}
+
+		public Builder withFilterPunc(Integer filterPunc) {
+			options.setFilterPunc(filterPunc);
+			return this;
+		}
+
+		public Builder withConvertNumMode(Integer convertNumMode) {
+			options.setConvertNumMode(convertNumMode);
+			return this;
+		}
+
+		public Builder withHotwordId(String hotwordId) {
+			options.setHotwordId(hotwordId);
+			return this;
+		}
+
+		public Builder withCustomizationId(String customizationId) {
+			options.setCustomizationId(customizationId);
+			return this;
+		}
+
+		public Builder withHotwordList(String hotwordList) {
+			options.setHotwordList(hotwordList);
+			return this;
+		}
+
+		public Builder withInputSampleRate(String inputSampleRate) {
+			options.setInputSampleRate(inputSampleRate);
+			return this;
+		}
+
+		public HunYuanAudioTranscriptionModelOptions build() {
+			return options;
+		}
+
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
 }

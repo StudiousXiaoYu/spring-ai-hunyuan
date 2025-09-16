@@ -26,9 +26,9 @@ public class ApiAuthHttpRequestInterceptor implements ClientHttpRequestIntercept
 		this.hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey, HunYuanConstants.DEFAULT_CHAT_HOST,
 				HunYuanConstants.DEFAULT_SERVICE);
 	}
+
 	public ApiAuthHttpRequestInterceptor(String secretId, String secretKey, String host, String service) {
-		this.hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey, host,
-				service);
+		this.hunYuanAuthApi = new HunYuanAuthApi(secretId, secretKey, host, service);
 	}
 
 	@Override
@@ -36,8 +36,9 @@ public class ApiAuthHttpRequestInterceptor implements ClientHttpRequestIntercept
 			throws IOException {
 		String action = request.getHeaders().getFirst("X-TC-Action");
 		String version = request.getHeaders().getFirst("X-TC-Version");
-//		String region = request.getHeaders().getFirst("X-TC-Region");
-		MultiValueMap<String, String> httpHeadersConsumer = hunYuanAuthApi.getHttpHeadersConsumer(action, version, body);
+		// String region = request.getHeaders().getFirst("X-TC-Region");
+		MultiValueMap<String, String> httpHeadersConsumer = hunYuanAuthApi.getHttpHeadersConsumer(action, version,
+				body);
 		request.getHeaders().putAll(httpHeadersConsumer);
 		ClientHttpResponse response = execution.execute(request, body);
 		return response;

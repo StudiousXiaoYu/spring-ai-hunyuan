@@ -16,27 +16,23 @@
 
 package io.github.studiousxiaoyu.hunyuan;
 
-import io.github.studiousxiaoyu.hunyuan.api.HunYuanConstants;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanEmbeddingModel;
+import io.github.studiousxiaoyu.hunyuan.audio.HunYuanAudioTextToVoiceModel;
 import io.github.studiousxiaoyu.hunyuan.audio.HunYuanAudioTranscriptionModel;
 import io.github.studiousxiaoyu.hunyuan.chat.HunYuanChatModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import reactor.core.publisher.Flux;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,25 +41,23 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @EnabledIfEnvironmentVariable(named = "HUNYUAN_SECRET_ID", matches = ".+")
 @EnabledIfEnvironmentVariable(named = "HUNYUAN_SECRET_KEY", matches = ".+")
-public class HunYuanAudioTranscriptionAutoConfigurationIT {
+public class HunYuanAudioTextToVoiceAutoConfigurationIT {
 
-	private static final Log logger = LogFactory.getLog(HunYuanAudioTranscriptionAutoConfigurationIT.class);
+	private static final Log logger = LogFactory.getLog(HunYuanAudioTextToVoiceAutoConfigurationIT.class);
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 		.withPropertyValues("spring.ai.hunyuan.secret-id=" + System.getenv("HUNYUAN_SECRET_ID"))
 		.withPropertyValues("spring.ai.hunyuan.secret-key=" + System.getenv("HUNYUAN_SECRET_KEY"))
-		.withConfiguration(AutoConfigurations.of(HunYuanAudioTranscriptionAutoConfiguration.class));
+		.withConfiguration(AutoConfigurations.of(HunYuanAudioTextToVoiceAutoConfiguration.class));
 
 	@Test
 	void transcribe() {
-		this.contextRunner.withConfiguration(AutoConfigurations.of(HunYuanAudioTranscriptionAutoConfiguration.class))
+		this.contextRunner.withConfiguration(AutoConfigurations.of(HunYuanAudioTextToVoiceAutoConfiguration.class))
 			.run(context -> {
-				HunYuanAudioTranscriptionModel transcriptionModel = context
-					.getBean(HunYuanAudioTranscriptionModel.class);
-				Resource audioFile = new ClassPathResource("/speech/speech1.mp3");
-				String response = transcriptionModel.call(audioFile);
+				HunYuanAudioTextToVoiceModel transcriptionModel = context.getBean(HunYuanAudioTextToVoiceModel.class);
+				String audioText = "你好";
+				byte[] response = transcriptionModel.call(audioText);
 				assertThat(response).isNotEmpty();
-				logger.info("Response: " + response);
 			});
 	}
 
@@ -75,55 +69,55 @@ public class HunYuanAudioTranscriptionAutoConfigurationIT {
 						"spring.ai.hunyuan.secret-id=API_ID",
 						"spring.ai.hunyuan.secret-key=API_KEY",
 						"spring.ai.hunyuan.base-url=TEST_BASE_URL",
-						"spring.ai.hunyuan.audio.transcription.options.model=MODEL_XYZ",
-						"spring.ai.hunyuan.audio.transcription.options.voiceFormat=mp3"
+						"spring.ai.hunyuan.audio.tts.options.voiceType=101011"
 				)
 				// @formatter:on
-			.withConfiguration(AutoConfigurations.of(HunYuanAudioTranscriptionAutoConfiguration.class))
+			.withConfiguration(AutoConfigurations.of(HunYuanAudioTextToVoiceAutoConfiguration.class))
 			.run(context -> {
-				var transcriptionProperties = context.getBean(HunYuanAudioTranscriptionProperties.class);
+				var transcriptionProperties = context.getBean(HunYuanAudioTextToVoiceProperties.class);
 				var connectionProperties = context.getBean(HunYuanCommonProperties.class);
 
 				assertThat(connectionProperties.getBaseUrl()).isEqualTo("TEST_BASE_URL");
 				assertThat(connectionProperties.getSecretKey()).isEqualTo("API_KEY");
 				assertThat(connectionProperties.getSecretId()).isEqualTo("API_ID");
-				assertThat(transcriptionProperties.getOptions().getModel()).isEqualTo("MODEL_XYZ");
-				assertThat(transcriptionProperties.getOptions().getVoiceFormat()).isEqualTo("mp3");
+				assertThat(transcriptionProperties.getOptions().getVoiceType()).isEqualTo(101011);
 			});
 	}
 
 	@Test
 	void audioTranscriptionModelActivation() {
-		this.contextRunner.withConfiguration(AutoConfigurations.of(HunYuanAudioTranscriptionAutoConfiguration.class))
+		this.contextRunner.withConfiguration(AutoConfigurations.of(HunYuanAudioTextToVoiceAutoConfiguration.class))
 			.run(context -> {
 				assertThat(context.getBeansOfType(HunYuanChatModel.class)).isEmpty();
 				assertThat(context.getBeansOfType(HunYuanEmbeddingModel.class)).isEmpty();
-				assertThat(context.getBeansOfType(HunYuanAudioTranscriptionModel.class)).isNotEmpty();
-			});
-
-		this.contextRunner.withConfiguration(AutoConfigurations.of(HunYuanAudioTranscriptionAutoConfiguration.class))
-			.withPropertyValues("spring.ai.hunyuan.audio.transcription.enabled=false")
-			.run(context -> {
-				assertThat(context.getBeansOfType(HunYuanAudioTranscriptionProperties.class)).isNotEmpty();
 				assertThat(context.getBeansOfType(HunYuanAudioTranscriptionModel.class)).isEmpty();
+				assertThat(context.getBeansOfType(HunYuanAudioTextToVoiceModel.class)).isNotEmpty();
 			});
 
-		this.contextRunner.withConfiguration(AutoConfigurations.of(HunYuanAudioTranscriptionAutoConfiguration.class))
-			.withPropertyValues("spring.ai.hunyuan.audio.transcription.enabled=true")
+		this.contextRunner.withConfiguration(AutoConfigurations.of(HunYuanAudioTextToVoiceAutoConfiguration.class))
+			.withPropertyValues("spring.ai.hunyuan.audio.tts.enabled=false")
 			.run(context -> {
-				assertThat(context.getBeansOfType(HunYuanAudioTranscriptionProperties.class)).isNotEmpty();
-				assertThat(context.getBeansOfType(HunYuanAudioTranscriptionModel.class)).isNotEmpty();
+				assertThat(context.getBeansOfType(HunYuanAudioTextToVoiceProperties.class)).isNotEmpty();
+				assertThat(context.getBeansOfType(HunYuanAudioTextToVoiceModel.class)).isEmpty();
+			});
+
+		this.contextRunner.withConfiguration(AutoConfigurations.of(HunYuanAudioTextToVoiceAutoConfiguration.class))
+			.withPropertyValues("spring.ai.hunyuan.audio.tts.enabled=true")
+			.run(context -> {
+				assertThat(context.getBeansOfType(HunYuanAudioTextToVoiceProperties.class)).isNotEmpty();
+				assertThat(context.getBeansOfType(HunYuanAudioTextToVoiceModel.class)).isNotEmpty();
 			});
 
 		this.contextRunner
 			.withConfiguration(AutoConfigurations.of(HunYuanAutoConfiguration.class,
-					HunYuanAudioTranscriptionAutoConfiguration.class))
+					HunYuanAudioTextToVoiceAutoConfiguration.class))
 			.withPropertyValues("spring.ai.hunyuan.chat.enabled=false", "spring.ai.hunyuan.embedding.enabled=false",
-					"spring.ai.hunyuan.audio.transcription.enabled=false")
+					"spring.ai.hunyuan.audio.tts.enabled=false", "spring.ai.hunyuan.audio.transcription.enabled=false")
 			.run(context -> {
 				assertThat(context.getBeansOfType(HunYuanChatModel.class)).isEmpty();
 				assertThat(context.getBeansOfType(HunYuanEmbeddingModel.class)).isEmpty();
 				assertThat(context.getBeansOfType(HunYuanAudioTranscriptionModel.class)).isEmpty();
+				assertThat(context.getBeansOfType(HunYuanAudioTextToVoiceModel.class)).isEmpty();
 			});
 	}
 

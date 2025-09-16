@@ -18,37 +18,34 @@ package io.github.studiousxiaoyu.hunyuan;
 
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanAudioApi;
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanConstants;
+import io.github.studiousxiaoyu.hunyuan.audio.HunYuanAudioTextToVoiceModelOptions;
 import io.github.studiousxiaoyu.hunyuan.audio.HunYuanAudioTranscriptionModelOptions;
-import org.springframework.ai.document.MetadataMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
-@ConfigurationProperties(HunYuanAudioTranscriptionProperties.CONFIG_PREFIX)
-public class HunYuanAudioTranscriptionProperties extends HunYuanParentProperties {
+@ConfigurationProperties(HunYuanAudioTextToVoiceProperties.CONFIG_PREFIX)
+public class HunYuanAudioTextToVoiceProperties extends HunYuanParentProperties {
 
-	public static final String CONFIG_PREFIX = "spring.ai.hunyuan.audio.transcription";
+	public static final String CONFIG_PREFIX = "spring.ai.hunyuan.audio.tts";
 
-	public static final String DEFAULT_AUDIO_MODEL = HunYuanAudioApi.TranscriptionModel.SIXTEEN_K_ZH_PY.getValue();
+	public static final Integer DEFAULT_AUDIO_VOICE_TYPE = 101010;
 
-	public static final String DEFAULT_AUDIO_FORMAT = "mp3";
+	public static final String DEFAULT_AUDIO_BASE_URL = HunYuanConstants.DEFAULT_TTS_URL;
 
-	public static final String DEFAULT_AUDIO_BASE_URL = HunYuanConstants.DEFAULT_TRANSCRIPTION_URL;
-
-	public HunYuanAudioTranscriptionProperties() {
+	public HunYuanAudioTextToVoiceProperties() {
 		super.setBaseUrl(DEFAULT_AUDIO_BASE_URL);
 	}
 
 	@NestedConfigurationProperty
-	private HunYuanAudioTranscriptionModelOptions options = HunYuanAudioTranscriptionModelOptions.builder()
-		.withModel(DEFAULT_AUDIO_MODEL)
-		.withVoiceFormat(DEFAULT_AUDIO_FORMAT)
+	private HunYuanAudioTextToVoiceModelOptions options = HunYuanAudioTextToVoiceModelOptions.builder()
+		.voiceType(DEFAULT_AUDIO_VOICE_TYPE)
 		.build();
 
-	public HunYuanAudioTranscriptionModelOptions getOptions() {
+	public HunYuanAudioTextToVoiceModelOptions getOptions() {
 		return this.options;
 	}
 
-	public void setOptions(HunYuanAudioTranscriptionModelOptions options) {
+	public void setOptions(HunYuanAudioTextToVoiceModelOptions options) {
 		this.options = options;
 	}
 

@@ -4,18 +4,20 @@ import org.springframework.ai.model.ModelOptions;
 import org.springframework.ai.model.ModelRequest;
 
 public class AudioTextToVoicePrompt implements ModelRequest<String> {
-    private final String text;
 
-    public AudioTextToVoicePrompt(String audioResource) {
-        this.text = audioResource;
-    }
+	private final String text;
 
-    public String getInstructions() {
-        return this.text;
-    }
+	public AudioTextToVoicePrompt(String audioResource) {
+		this.text = audioResource;
+	}
 
-    @Override
-    public ModelOptions getOptions() {
-        return null;
-    }
+	public String getInstructions() {
+		return this.text;
+	}
+
+	@Override
+	public ModelOptions getOptions() {
+		return null;
+	}
+
 }
