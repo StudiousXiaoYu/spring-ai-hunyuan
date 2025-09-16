@@ -85,18 +85,26 @@ public class HunYuanAudioApi {
 	public HunYuanAudioApi(String baseUrl, String secretId, String secretKey, String action,
                            RestClient.Builder restClientBuilder, ResponseErrorHandler responseErrorHandler) {
 
+		this(baseUrl, secretId, secretKey, action,HunYuanConstants.DEFAULT_TRANSCRIPTION_SERVICE,HunYuanConstants.DEFAULT_TRANSCRIPTION_HOST,
+				HunYuanConstants.DEFAULT_TRANSCRIPTION_VERSION,restClientBuilder,
+				responseErrorHandler);
+	}
+	public HunYuanAudioApi(String baseUrl, String secretId, String secretKey, String action,String service,String host,String version,
+						   RestClient.Builder restClientBuilder, ResponseErrorHandler responseErrorHandler) {
 		Consumer<HttpHeaders> jsonContentHeaders = headers -> {
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			headers.add("X-TC-Action", action);
-			headers.add("X-TC-Version", HunYuanConstants.DEFAULT_TRANSCRIPTION_VERSION);
+			headers.add("X-TC-Version", version);
 		};
-		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey,HunYuanConstants.DEFAULT_TRANSCRIPTION_HOST,HunYuanConstants.DEFAULT_TRANSCRIPTION_SERVICE);
+		apiAuthHttpRequestInterceptor = new ApiAuthHttpRequestInterceptor(secretId, secretKey,host,service);
 		this.restClient = restClientBuilder.baseUrl(baseUrl)
-			.defaultHeaders(jsonContentHeaders)
-			.defaultStatusHandler(responseErrorHandler)
-			.requestInterceptor(apiAuthHttpRequestInterceptor)
-			.build();
+				.defaultHeaders(jsonContentHeaders)
+				.defaultStatusHandler(responseErrorHandler)
+				.requestInterceptor(apiAuthHttpRequestInterceptor)
+				.build();
+
 	}
+
 
 	public ResponseEntity<TranscriptionResponse> createTranscription(TranscriptionRequest request, Class<TranscriptionResponse> transcriptionResponseClass) {
 
@@ -107,6 +115,16 @@ public class HunYuanAudioApi {
 				.toEntity(String.class);
 		TranscriptionResponse transcriptionResponse = ModelOptionsUtils.jsonToObject(response.getBody(), transcriptionResponseClass);
 		return ResponseEntity.ok(transcriptionResponse);
+	}
+
+	public ResponseEntity<TextToVoiceResponse> createTextToVoice(TextToVoiceRequest textToVoiceRequest, Class<TextToVoiceResponse> audioTextToVoiceResponseClass) {
+		ResponseEntity<String> response = this.restClient.post()
+				.uri("/")
+				.body(textToVoiceRequest)
+				.retrieve()
+				.toEntity(String.class);
+		TextToVoiceResponse textToVoiceResponse = ModelOptionsUtils.jsonToObject(response.getBody(), audioTextToVoiceResponseClass);
+		return ResponseEntity.ok(textToVoiceResponse);
 	}
 
 
@@ -267,6 +285,150 @@ public class HunYuanAudioApi {
 		public record SentenceWord(@JsonProperty("Word") String word,
 								   @JsonProperty("StartTime") String startTime,
 								   @JsonProperty("EndTime") String endTime){}
+	}
+
+
+	@JsonInclude(Include.NON_NULL)
+	public record TextToVoiceRequest(
+			@JsonProperty("Text") String text,
+			@JsonProperty("SessionId") String sessionId,
+			@JsonProperty("Volume") Float volume,
+			@JsonProperty("Speed") Float speed,
+			@JsonProperty("ProjectId") Integer projectId,
+			@JsonProperty("ModelType") Integer modelType,
+			@JsonProperty("VoiceType") Integer voiceType,
+			@JsonProperty("FastVoiceType") String fastVoiceType,
+			@JsonProperty("PrimaryLanguage") Integer primaryLanguage,
+			@JsonProperty("SampleRate") Integer sampleRate,
+			@JsonProperty("Codec") String codec,
+			@JsonProperty("EnableSubtitle") Boolean enableSubtitle,
+			@JsonProperty("SegmentRate") Integer segmentRate,
+			@JsonProperty("EmotionCategory") String emotionCategory,
+			@JsonProperty("EmotionIntensity") Integer emotionIntensity) {
+
+		public static Builder builder() {
+			return new Builder();
+		}
+
+		public static class Builder {
+			private String text;
+			private String sessionId;
+			private Float volume;
+			private Float speed;
+			private Integer projectId;
+			private Integer modelType;
+			private Integer voiceType;
+			private String fastVoiceType;
+			private Integer primaryLanguage;
+			private Integer sampleRate;
+			private String codec;
+			private Boolean enableSubtitle;
+			private Integer segmentRate;
+			private String emotionCategory;
+			private Integer emotionIntensity;
+
+			public Builder text(String text) {
+				this.text = text;
+				return this;
+			}
+
+			public Builder sessionId(String sessionId) {
+				this.sessionId = sessionId;
+				return this;
+			}
+
+			public Builder volume(Float volume) {
+				this.volume = volume;
+				return this;
+			}
+
+			public Builder speed(Float speed) {
+				this.speed = speed;
+				return this;
+			}
+
+			public Builder projectId(Integer projectId) {
+				this.projectId = projectId;
+				return this;
+			}
+
+			public Builder modelType(Integer modelType) {
+				this.modelType = modelType;
+				return this;
+			}
+
+			public Builder voiceType(Integer voiceType) {
+				this.voiceType = voiceType;
+				return this;
+			}
+
+			public Builder fastVoiceType(String fastVoiceType) {
+				this.fastVoiceType = fastVoiceType;
+				return this;
+			}
+
+			public Builder primaryLanguage(Integer primaryLanguage) {
+				this.primaryLanguage = primaryLanguage;
+				return this;
+			}
+
+			public Builder sampleRate(Integer sampleRate) {
+				this.sampleRate = sampleRate;
+				return this;
+			}
+
+			public Builder codec(String codec) {
+				this.codec = codec;
+				return this;
+			}
+
+			public Builder enableSubtitle(Boolean enableSubtitle) {
+				this.enableSubtitle = enableSubtitle;
+				return this;
+			}
+
+			public Builder segmentRate(Integer segmentRate) {
+				this.segmentRate = segmentRate;
+				return this;
+			}
+
+			public Builder emotionCategory(String emotionCategory) {
+				this.emotionCategory = emotionCategory;
+				return this;
+			}
+
+			public Builder emotionIntensity(Integer emotionIntensity) {
+				this.emotionIntensity = emotionIntensity;
+				return this;
+			}
+
+			public TextToVoiceRequest build() {
+				return new TextToVoiceRequest(text, sessionId, volume, speed, projectId, modelType,
+						voiceType, fastVoiceType, primaryLanguage, sampleRate, codec, enableSubtitle,
+						segmentRate, emotionCategory, emotionIntensity);
+			}
+		}
+
+	}
+	@JsonInclude(Include.NON_NULL)
+	public record TextToVoiceResponse(
+			// @formatter:off
+			@JsonProperty("Response") HunYuanAudioApi.TextToVoiceDetail response
+	) {
+		// @formatter:on
+	}
+	@JsonInclude(Include.NON_NULL)
+	public record TextToVoiceDetail(@JsonProperty("Audio") String audio,
+									  @JsonProperty("SessionId") Integer sessionId,
+									  @JsonProperty("Subtitles") List<Subtitle> subtitles,
+									  @JsonProperty("RequestId") String requestId){
+		public record Subtitle(@JsonProperty("Text") String text,
+								   @JsonProperty("BeginTime") Integer beginTime,
+								   @JsonProperty("EndTime") Integer endTime,
+							   @JsonProperty("BeginIndex") Integer beginIndex,
+							   @JsonProperty("EndIndex") Integer endIndex,
+							   @JsonProperty("Phoneme") String phoneme
+							   ){}
 	}
 
 }
