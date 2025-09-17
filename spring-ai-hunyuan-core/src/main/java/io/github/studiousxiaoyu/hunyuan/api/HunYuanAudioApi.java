@@ -312,6 +312,7 @@ public class HunYuanAudioApi {
 
 	@JsonInclude(Include.NON_NULL)
 	public record TranscriptionDetail(@JsonProperty("Result") String result,
+			@JsonProperty("Error") HunYuanApi.ChatCompletion.ErrorMsg errorMsg,
 			@JsonProperty("AudioDuration") Integer audioDuration, @JsonProperty("WordSize") Integer wordSize,
 			@JsonProperty("WordList") List<SentenceWord> WordList, @JsonProperty("RequestId") String requestId) {
 		public record SentenceWord(@JsonProperty("Word") String word, @JsonProperty("StartTime") String startTime,
@@ -460,6 +461,7 @@ public class HunYuanAudioApi {
 
 	@JsonInclude(Include.NON_NULL)
 	public record TextToVoiceDetail(@JsonProperty("Audio") String audio, @JsonProperty("SessionId") String sessionId,
+			@JsonProperty("Error") HunYuanApi.ChatCompletion.ErrorMsg errorMsg,
 			@JsonProperty("Subtitles") List<Subtitle> subtitles, @JsonProperty("RequestId") String requestId) {
 		public record Subtitle(@JsonProperty("Text") String text, @JsonProperty("BeginTime") Integer beginTime,
 				@JsonProperty("EndTime") Integer endTime, @JsonProperty("BeginIndex") Integer beginIndex,

@@ -69,6 +69,12 @@ public class HunYuanAudioTranscriptionModel implements Model<AudioTranscriptionP
 			return new AudioTranscriptionResponse(null);
 		}
 
+		if (transcription.response().errorMsg() != null) {
+			String index = transcription.response().errorMsg().index();
+			String message = transcription.response().errorMsg().message();
+			throw new RuntimeException("Error in textToVoice request: " + index + ": " + message);
+		}
+
 		AudioTranscription transcript = new AudioTranscription(transcription.response().result());
 
 		return new AudioTranscriptionResponse(transcript);

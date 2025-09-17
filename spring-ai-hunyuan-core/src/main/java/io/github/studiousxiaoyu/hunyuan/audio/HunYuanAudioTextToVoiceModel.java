@@ -65,6 +65,13 @@ public class HunYuanAudioTextToVoiceModel implements Model<AudioTextToVoicePromp
 			logger.warn("No textToVoice returned for request: {}", textResource);
 			return new AudioTextToVoiceResponse(null);
 		}
+
+		if (transcription.response().errorMsg() != null) {
+			String index = transcription.response().errorMsg().index();
+			String message = transcription.response().errorMsg().message();
+			throw new RuntimeException("Error in textToVoice request: " + index + ": " + message);
+		}
+
 		byte[] decode = Base64.getDecoder().decode(transcription.response().audio());
 		AudioTextToVoiceResult transcript = new AudioTextToVoiceResult(decode);
 

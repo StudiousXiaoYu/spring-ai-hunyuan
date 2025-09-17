@@ -52,9 +52,11 @@ public class HunYuanAudioTextToVoiceAutoConfigurationIT {
 
 	@Test
 	void transcribe() {
-		this.contextRunner.withConfiguration(AutoConfigurations.of(HunYuanAudioTextToVoiceAutoConfiguration.class))
+		this.contextRunner.withPropertyValues("spring.ai.hunyuan.audio.tts.options.voiceType=501003")
+			.withConfiguration(AutoConfigurations.of(HunYuanAudioTextToVoiceAutoConfiguration.class))
 			.run(context -> {
 				HunYuanAudioTextToVoiceModel transcriptionModel = context.getBean(HunYuanAudioTextToVoiceModel.class);
+
 				String audioText = "你好";
 				byte[] response = transcriptionModel.call(audioText);
 				assertThat(response).isNotEmpty();

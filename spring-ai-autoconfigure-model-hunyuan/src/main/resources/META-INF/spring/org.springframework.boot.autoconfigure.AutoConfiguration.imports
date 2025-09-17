@@ -1,2 +1,3 @@
 io.github.studiousxiaoyu.hunyuan.HunYuanAutoConfiguration
 io.github.studiousxiaoyu.hunyuan.HunYuanAudioTranscriptionAutoConfiguration
+io.github.studiousxiaoyu.hunyuan.HunYuanAudioTextToVoiceAutoConfiguration

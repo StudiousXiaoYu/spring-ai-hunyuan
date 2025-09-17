@@ -54,7 +54,7 @@ public class HunYuanAudioTranscriptionAutoConfiguration {
 		var hunyuanApi = hunYuanAudioApi(chatProperties.getSecretId(), commonProperties.getSecretId(),
 				chatProperties.getSecretKey(), commonProperties.getSecretKey(), chatProperties.getBaseUrl());
 
-		return new HunYuanAudioTranscriptionModel(hunyuanApi);
+		return new HunYuanAudioTranscriptionModel(hunyuanApi, chatProperties.getOptions());
 	}
 
 	private HunYuanAudioApi hunYuanAudioApi(String secretId, String commonSecretId, String secretKey,
