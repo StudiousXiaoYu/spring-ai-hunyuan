@@ -52,8 +52,7 @@ public class HunYuanAudioTextToVoiceAutoConfigurationIT {
 
 	@Test
 	void transcribe() {
-		this.contextRunner.withPropertyValues("spring.ai.hunyuan.audio.tts.options.voiceType=501003")
-			.withConfiguration(AutoConfigurations.of(HunYuanAudioTextToVoiceAutoConfiguration.class))
+		this.contextRunner.withConfiguration(AutoConfigurations.of(HunYuanAudioTextToVoiceAutoConfiguration.class))
 			.run(context -> {
 				HunYuanAudioTextToVoiceModel transcriptionModel = context.getBean(HunYuanAudioTextToVoiceModel.class);
 
