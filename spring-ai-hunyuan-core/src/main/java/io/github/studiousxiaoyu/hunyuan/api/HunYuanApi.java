@@ -469,7 +469,9 @@ public class HunYuanApi {
 			@JsonProperty("EnableDeepSearch") Boolean enableDeepSearch,
 			@JsonProperty("Seed") Integer seed,
 			@JsonProperty("ForceSearchEnhancement") Boolean forceSearchEnhancement,
-			@JsonProperty("EnableRecommendedQuestions") Boolean enableRecommendedQuestions
+			@JsonProperty("EnableRecommendedQuestions") Boolean enableRecommendedQuestions,
+	 @JsonProperty("EnableDeepRead") Boolean enableDeepRead,
+			 @JsonProperty("EnableThinking") Boolean enableThinking
 	) {
 		 // @formatter:on
 
@@ -482,7 +484,7 @@ public class HunYuanApi {
 		 */
 		public ChatCompletionRequest(List<ChatCompletionMessage> messages, String model) {
 			this(model, messages, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-					null, null, null);
+					null, null, null, null, null);
 		}
 
 		/**
@@ -498,7 +500,7 @@ public class HunYuanApi {
 		public ChatCompletionRequest(List<ChatCompletionMessage> messages, String model, Double temperature,
 				Boolean stream) {
 			this(model, messages, temperature, null, null, null, stream, null, null, null, null, null, null, null, null,
-					null, null, null, null);
+					null, null, null, null, null, null);
 		}
 
 		/**
@@ -511,7 +513,7 @@ public class HunYuanApi {
 		 */
 		public ChatCompletionRequest(List<ChatCompletionMessage> messages, String model, Double temperature) {
 			this(model, messages, temperature, null, null, null, null, null, null, null, null, null, null, null, null,
-					null, null, null, null);
+					null, null, null, null, null, null);
 		}
 
 		/**
@@ -527,7 +529,7 @@ public class HunYuanApi {
 		public ChatCompletionRequest(List<ChatCompletionMessage> messages, String model, List<FunctionTool> tools,
 				String toolChoice) {
 			this(model, messages, null, null, null, null, null, null, tools, toolChoice, null, null, null, null, null,
-					null, null, null, null);
+					null, null, null, null, null, null);
 		}
 
 		/**
@@ -547,7 +549,7 @@ public class HunYuanApi {
 				Boolean streamModeration, Boolean enableEnhancement, Boolean searchInfo, Boolean citation,
 				Boolean enableSpeedSearch) {
 			this(model, messages, null, enableEnhancement, null, null, stream, streamModeration, null, null, null,
-					searchInfo, citation, null, null, enableSpeedSearch, null, null, null);
+					searchInfo, citation, null, null, enableSpeedSearch, null, null, null, null, null);
 		}
 
 		/**
@@ -556,7 +558,7 @@ public class HunYuanApi {
 		 */
 		public ChatCompletionRequest(List<ChatCompletionMessage> messages, Boolean stream) {
 			this(DEFAULT_CHAT_MODEL, messages, null, null, null, null, stream, null, null, null, null, null, null, null,
-					null, null, null, null, null);
+					null, null, null, null, null, null, null);
 		}
 
 		/**

@@ -18,13 +18,17 @@ package io.github.studiousxiaoyu.hunyuan;
 
 import io.github.studiousxiaoyu.hunyuan.api.HunYuanEmbeddingModel;
 import io.github.studiousxiaoyu.hunyuan.chat.HunYuanChatModel;
+import io.github.studiousxiaoyu.hunyuan.chat.HunYuanChatOptions;
+import io.github.studiousxiaoyu.hunyuan.chat.message.HunYuanAssistantMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -57,6 +61,17 @@ public class HunYuanAutoConfigurationIT {
 			String response = client.call("Hello");
 			assertThat(response).isNotEmpty();
 			logger.info("Response: " + response);
+		});
+	}
+
+	@Test
+	void generateThink() {
+		this.contextRunner.run(context -> {
+			HunYuanChatModel client = context.getBean(HunYuanChatModel.class);
+			HunYuanChatOptions model = HunYuanChatOptions.builder().enableThinking(true).model("hunyuan-a13b").build();
+			ChatResponse response = client.call(new Prompt(new UserMessage("hello"), model));
+			assertThat(response.getResult().getOutput()).isNotNull();
+			assertThat(((HunYuanAssistantMessage) response.getResult().getOutput()).getReasoningContent()).isNotNull();
 		});
 	}
 

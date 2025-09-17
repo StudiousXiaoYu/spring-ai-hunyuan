@@ -270,7 +270,7 @@ public class HunYuanChatOptions implements ToolCallingChatOptions {
 	}
 
 	public void setForceSearchEnhancement(Boolean forceSearchEnhancement) {
-		forceSearchEnhancement = forceSearchEnhancement;
+		this.forceSearchEnhancement = forceSearchEnhancement;
 	}
 
 	public Boolean getEnableRecommendedQuestions() {
@@ -286,7 +286,7 @@ public class HunYuanChatOptions implements ToolCallingChatOptions {
 	}
 
 	public void setEnableThinking(Boolean enableThinking) {
-		enableThinking = enableThinking;
+		this.enableThinking = enableThinking;
 	}
 
 	public Boolean getEnableDeepRead() {
@@ -511,6 +511,67 @@ public class HunYuanChatOptions implements ToolCallingChatOptions {
 			else {
 				this.options.toolContext.putAll(toolContext);
 			}
+			return this;
+		}
+
+		// 补充的属性设置方法
+		public Builder enableEnhancement(Boolean enableEnhancement) {
+			this.options.enableEnhancement = enableEnhancement;
+			return this;
+		}
+
+		public Builder streamModeration(Boolean streamModeration) {
+			this.options.streamModeration = streamModeration;
+			return this;
+		}
+
+		public Builder customTool(HunYuanApi.FunctionTool customTool) {
+			this.options.customTool = customTool;
+			return this;
+		}
+
+		public Builder searchInfo(Boolean searchInfo) {
+			this.options.searchInfo = searchInfo;
+			return this;
+		}
+
+		public Builder citation(Boolean citation) {
+			this.options.citation = citation;
+			return this;
+		}
+
+		public Builder enableSpeedSearch(Boolean enableSpeedSearch) {
+			this.options.enableSpeedSearch = enableSpeedSearch;
+			return this;
+		}
+
+		public Builder enableMultimedia(Boolean enableMultimedia) {
+			this.options.enableMultimedia = enableMultimedia;
+			return this;
+		}
+
+		public Builder enableDeepSearch(Boolean enableDeepSearch) {
+			this.options.enableDeepSearch = enableDeepSearch;
+			return this;
+		}
+
+		public Builder forceSearchEnhancement(Boolean forceSearchEnhancement) {
+			this.options.forceSearchEnhancement = forceSearchEnhancement;
+			return this;
+		}
+
+		public Builder enableRecommendedQuestions(Boolean enableRecommendedQuestions) {
+			this.options.enableRecommendedQuestions = enableRecommendedQuestions;
+			return this;
+		}
+
+		public Builder enableThinking(Boolean enableThinking) {
+			this.options.enableThinking = enableThinking;
+			return this;
+		}
+
+		public Builder enableDeepRead(Boolean enableDeepRead) {
+			this.options.enableDeepRead = enableDeepRead;
 			return this;
 		}
 
